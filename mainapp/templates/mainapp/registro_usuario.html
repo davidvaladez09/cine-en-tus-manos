@@ -1,0 +1,132 @@
+{% load static %}
+{% load form_extras %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}REGISTRO DE USUARIO{% endblock %}</title>
+    <link rel="icon" href="{% static 'mainapp/images/channels4_profile.jpg' %}" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/style.registro.css' %}">
+</head>
+
+<body style='font-family: oswald; font-size: 18px;'>
+    <div class="wrapper fadeInDown">
+        <div id="formContent">
+            <div class="fadeIn first">
+                <a class="navbar-brand" href="{% url 'admin_view' %}" style="color: white">
+                    <img src="{% static 'mainapp/images/perfil-removebg-preview.png' %}" id="icon" alt="User Icon" style="width: 20rem; margin-bottom: 2rem"/>
+                </a>
+            </div>
+
+            {% if messages %}
+                <div class="container mt-4">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="background: #12a15e">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data" style="font-size: 20px">
+                {% csrf_token %}
+                <div class="row g-2">
+                    <div class="col-md">
+                        <div class="form-floating">
+                            <div class="mb-3">
+                                <label for="floatingInputGrid" style='color: white;'>Ingresa Correo</label>
+                                {{ user_form.correo|add_attrs:"class=form-control,id=floatingInputGrid,style=width:28rem;" }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="floatingInputGrid" style='color: white;'>Ingresa Password</label>
+                                {{ user_form.password1|add_attrs:"class=form-control,id=password,style=width:28rem;" }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="form-floating">
+                            <div class="mb-3">
+                                <label for="nombre_usuario" style='color: white;'>Ingresa Nombre</label>
+                                {{ user_form.nombre|add_attrs:"class=form-control,id=floatingInputGrid,style=width:28rem;" }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="floatingInputGrid" style='color: white;'>Confirma Password</label>
+                                {{ user_form.password2|add_attrs:"class=form-control,id=password" }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="floatingInputGrid" style='color: white;'>Ingresa una descripcion para el colaborador</label>
+                        <br>
+                        {{ user_form.descripcion|add_attrs:"class=form-control,id=floatingTextareaDisabled" }}
+                    </div>
+
+                    <div class="d-grid gap-2 col-6 mx-auto">
+                        <div class="mb-3">
+                            <label for="floatingInputGrid" style='color: white;'>Selecciona Foto de Perfil</label>
+                            <select id="id_foto_perfil" name="foto_perfil" class="form-select form-select-lg">
+                                {% for foto in fotos_perfil %}
+                                    <option value="{{ foto.pk }}" data-img-url="{{ foto.direccion.url }}">{{ foto.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                
+                </div>
+
+                <div class="d-grid gap-2 col-6 mx-auto">
+                    <div class="mb-3">
+                        <div class="card" style="width: 32rem; border-radius: 10px;">
+                            <img class="card-img-top" src="" alt="Foto de perfil" style="border-radius: 10px;" id="foto-perfil-preview">
+                            <div class="card-body">
+                                <h5 class="card-title" style="font-weight: bold;">Foto de perfil seleccionada</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br>
+
+                <label for="floatingInputGrid" style='color: white;'>Selecciona Rol de Colaborador</label>
+                <br> 
+                {{ user_form.permisos }}
+
+                <br>
+                <br>
+
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary mb-3">REGISTRAR COLABORADOR</button>
+                </div>
+            </form>
+
+            <a href="{% url 'login' %}" style="color: white; font-family: sans-serif; font-size: .8rem; font-weight: bold; margin-left: 2rem; margin-top: 1rem">INICIAR SESION</a> | <a href="{% url 'admin_view' %}" style="color: white; font-family: sans-serif; font-size: .8rem; font-weight: bold; margin-top: 1rem">ADMINISTRADOR</a>
+
+            <br>
+            <br>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fotoPerfilDropdown = document.getElementById('id_foto_perfil');
+            const fotoPerfilPreview = document.getElementById('foto-perfil-preview');
+
+            fotoPerfilDropdown.addEventListener('change', function() {
+                const selectedFotoPerfil = fotoPerfilDropdown.options[fotoPerfilDropdown.selectedIndex];
+                const fotoPerfilUrl = selectedFotoPerfil.getAttribute('data-img-url');
+                fotoPerfilPreview.src = fotoPerfilUrl;
+            });
+        });
+    </script>
+</body>
+</html>

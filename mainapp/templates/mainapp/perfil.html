@@ -1,0 +1,111 @@
+{% extends 'mainapp/base.html' %}
+{% load form_extras %}
+{% load static %} <!-- Cargar el tag static -->
+{% get_media_prefix as media_prefix %}
+
+{% block title %}PERFIL{% endblock %}
+
+{% block content %}
+
+<div class="h1">
+    <a class="navbar-brand" href={% url 'perfil' %} style="color: #AAB7B8;">
+        <img src="{% static 'mainapp/images/icon_perfil.png' %}" alt="Logo" width="60" height="60" class="d-inline-block align-text-top">
+        PERFIL
+    </a>
+</div>
+
+<div class='container'>
+    <br>
+
+    {% if messages %}
+        <div class="container mb3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="background: #12a15e">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row g-2">
+            <div class="col-md">
+                <div class="form-floating">
+                    <div class="mb-3">
+                        <div class="card" style="width: 32rem; border-radius: 10px;">
+                            <img class="card-img-top" src="{{ usuario.foto_perfil.direccion.url }}" alt="Foto de perfil" style="border-radius: 10px;" id="foto-perfil-preview">
+                            <div class="card-body">
+                                <h5 class="card-title" style="font-weight: bold;">{{ usuario.nombre }}</h5>
+                                <p class="card-text">{{ usuario.correo }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="form-floating">
+                    <div class="mb-3">
+                        <label for="inputEmail4" style="color: aliceblue; font-weight: bold;">Tipo de Usuario</label>
+                        <div class="card">
+                            <div class="card-body" style="width: 100%;">
+                                {% if usuario.permisos_id == 1 %}
+                                    Administrador
+                                {% else %}
+                                    Colaborador
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputEmail4" style="color: aliceblue; font-weight: bold;">Correo</label>
+                        <div class="card">
+                            <div class="card-body" style="width: 100%;">
+                                {{ usuario.correo }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" value="{{ usuario.nombre }}" style='height: 4rem;'>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <input type="text" class="form-control" id="descripcion" name="descripcion" value="{{ usuario.descripcion }}" style='height: 4rem;'>
+
+                    </div>
+                    <div class="mb-3">
+                        <label for="foto_perfil" class="form-label">Selecciona una nueva foto de perfil</label>
+                        <select id="id_foto_perfil" name="foto_perfil" class="form-control">
+                            {% for foto in fotos_perfil %}
+                                <option value="{{ foto.pk }}" {% if foto.pk == usuario.foto_perfil.pk %}selected{% endif %} data-img-url="{{ foto.direccion.url }}">{{ foto.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success" name="editar_perfil">CONFIRMAR CAMBIOS Y EDITAR PERFIL</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    
+    <br>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fotoPerfilDropdown = document.getElementById('id_foto_perfil');
+            const fotoPerfilPreview = document.getElementById('foto-perfil-preview');
+
+            fotoPerfilDropdown.addEventListener('change', function() {
+                const selectedFotoPerfil = fotoPerfilDropdown.options[fotoPerfilDropdown.selectedIndex];
+                const fotoPerfilUrl = selectedFotoPerfil.getAttribute('data-img-url');
+                fotoPerfilPreview.src = fotoPerfilUrl;
+            });
+        });
+    </script>
+
+{% endblock %}

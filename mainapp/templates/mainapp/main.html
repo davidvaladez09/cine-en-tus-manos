@@ -1,0 +1,144 @@
+{% extends 'mainapp/base.html' %}
+{% load static %} <!-- Cargar el tag static -->
+{% get_media_prefix as media_prefix %} <!-- Obtener el prefijo de medios -->
+
+{% block title %}INICIO{% endblock %}
+
+{% block content %}
+
+<div class="card text-bg-dark">
+    <a href="{% url 'nosotros' %}">
+        <img src="{% static 'mainapp/images/portada.jpeg' %}" class="card-img" alt="...">
+    </a>
+</div>
+
+<br>
+
+<!-- Formulario de filtro -->
+<div class="dropdown" style="font-family: oswald; font-size: 22px;">
+    <button type="button" class="btn btn-outline-warning dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false" style:"background: #0a2fcc">
+      SELECCIONA UN FILTRO
+    </button>
+
+    <ul class="dropdown-menu">
+        <form method="GET" action="" style="margin: 2rem;">
+            {{ filter_form.as_p }}
+            <button type="submit" class="btn btn-success">Aplicar filtros</button>
+            <a class="btn btn-primary" href="{% url 'home' %}" role="button" aria-disabled="true">Limpiar filtros</a>
+        </form>
+    </ul>
+</div>
+
+<br>
+
+<div class="row">
+    <div class="col-sm-6 mb-3 mb-sm-0">
+        {% for critica in criticas|slice:"::2" %}
+            <a href="{% url 'detalle_critica' critica.pk %}" class="text-decoration-none text-reset">
+                <div class="card mb-3" style="max-width: 640px; color: black;">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src=".{{ critica.ruta_foto_critica.url }}" class="card-img-top" alt="...">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ critica.nombre }}</h5>
+                                <p class="card-text">{{ critica.critica }}</p>
+                            </div>
+                        </div>
+                        <br>
+                        <p class="card-text"><small class="text-body-secondary" style:"margin: 1rem;">{{ critica.datetime }}</small></p>
+                        <footer class="blockquote-footer">Escrita por: <cite title="Source Title"> {{ critica.user.nombre }}</cite></footer>
+                        <div class="card-footer text-body-secondary">
+                            <label>Calificación: {{ critica.calificacion }}</label><br>
+                            {% if critica.calificacion %}
+                                {% with calificacion=critica.calificacion %}
+                                    {% for i in "x"|ljust:10 %}
+                                        {% if forloop.counter0 < calificacion %}
+                                            <i class="fa fa-star"></i>
+                                        {% elif forloop.counter0 < calificacion|add:'0.5' and not calificacion|floatformat:"0" == calificacion %}
+                                            <i class="fa fa-star-half-alt"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endwith %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="col-sm-6">
+        {% for critica in criticas|slice:"1::2" %}
+            <a href="{% url 'detalle_critica' critica.pk %}" class="text-decoration-none text-reset">
+                <div class="card mb-3" style="max-width: 640px; color: black;">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src=".{{ critica.ruta_foto_critica.url }}" class="card-img-top" alt="...">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ critica.nombre }}</h5>
+                                <p class="card-text">{{ critica.critica }}</p>
+                                <p class="card-text"><small class="text-body-secondary">{{ critica.datetime }}</small></p>
+                                <br>
+                            </div>
+                        </div>
+                        <footer class="blockquote-footer">Escrita por: <cite title="Source Title"> {{ critica.user.nombre }}</cite></footer>
+                        <div class="card-footer text-body-secondary">
+                            <label>Calificación: {{ critica.calificacion }}</label><br>
+                            {% if critica.calificacion %}
+                                {% with calificacion=critica.calificacion %}
+                                    {% for i in "x"|ljust:10 %}
+                                        {% if forloop.counter0 < calificacion %}
+                                            <i class="fa fa-star"></i>
+                                        {% elif forloop.counter0 < calificacion|add:'0.5' and not calificacion|floatformat:"0" == calificacion %}
+                                            <i class="fa fa-star-half-alt"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endwith %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="carouselExampleIndicators" class="carousel slide">
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="{% static 'mainapp/images/portada.jpeg' %}" class="d-block w-100" alt="...">
+      </div>
+      <div class="carousel-item">
+        <img src="{% static 'mainapp/images/perfil.jpg' %}" class="d-block w-100" alt="...">
+      </div>
+      <div class="carousel-item">
+        <img src="{% static 'mainapp/images/perfil_invertido.png' %}" class="d-block w-100" alt="...">
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+
+  <br>
+  <br>
+
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'mainapp/base.html' %}
+
+{% block title %}EDITAR O ELIMINAR COLABORADOR{% endblock %}
+
+{% block content %}
+
+{% load static %}
+{% load dict_get %}
+
+<div class="h1">
+    <a class="navbar-brand" href="{% url 'editar_eliminar_usuario' %}" style="color: #AAB7B8;">
+        <img src="{% static 'mainapp/images/icon_editar.png' %}" alt="Logo" width="60" height="60" class="d-inline-block align-text-top">
+        <img src="{% static 'mainapp/images/icon_eliminar.png' %}" alt="Logo" width="60" height="60" class="d-inline-block align-text-top">
+        EDITAR O ELIMINAR COLABORADOR
+    </a>
+</div>
+
+<br>
+
+{% if messages %}
+    <div class="container mb3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="background: #12a15e">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<br>
+
+<div class="d-grid gap-2">
+    <a href="{% url 'registro_usuario'%}" type="button" class="btn btn-light">REGISTRAR NUEVO COLABORADOR</a>
+</div>
+
+<br>
+
+{% for usuario in usuarios %}
+    {% with forms|dict_get:usuario.correo as form %}
+        {% if form %}
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card mb-3" style="color: black;">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="correo" style="color: black; font-weight: bold;">Correo</label>
+                            <div class="card">
+                                <div class="card-body" style="width: 100%;">
+                                    {{ usuario.correo }}
+                                </div>
+                                <input type="hidden" name="correo" value="{{ usuario.correo }}">
+                            </div>
+                        </div>
+                        {{ form.as_p }}
+                        <button type="submit" name="update" class="btn btn-success">Guardar Cambios</button>
+                        <button type="submit" name="delete" class="btn btn-danger">Eliminar Colaborador</button>
+                    </div>
+                </div>
+            </form>
+            <br>
+        {% else %}
+            <p>Error al cargar el formulario para {{ usuario.correo }}.</p>
+        {% endif %}
+    {% endwith %}
+{% endfor %}
+
+{% endblock %}

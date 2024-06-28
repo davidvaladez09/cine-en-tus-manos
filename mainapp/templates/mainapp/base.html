@@ -1,0 +1,189 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Cine En Tus Manos{% endblock %}</title>
+    <link rel="icon" href="{% static 'mainapp/images/channels4_profile.jpg' %}" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+
+    <style>
+        .social-icons a {
+            color: #fff;
+            margin: 0 10px;
+            text-decoration: none;
+            font-size: 24px;
+        }
+
+        .social-icons a:hover {
+            color: #f0a500;
+        }
+
+        hr {
+          border: 0;
+          height: 2px;
+          background-color: white; /* Color de la línea */
+          margin: 20px 0; /* Espaciado arriba y abajo */
+        }
+
+        .mb-3 {
+          color: white;
+        }
+    </style>
+</head>
+
+<body style="background: #191919;  font-family: oswald; font-size: 22px;">
+    <nav class="navbar navbar-dark bg-black fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href={% url 'home' %} style="color: white; font-size: 30px;">
+          <img src="{% static 'mainapp/images/perfil_invertido.png' %}" alt="Logo" width="60" height="48" class="d-inline-block align-text-top">
+          Cine En Tus Manos
+        </a>
+
+        <ul class="nav justify-content-center">
+          <li class="nav-item">
+            <a class="nav-link" href={% url 'mas_y_mas_chismes' %} style="color: white;">MÁS Y MÁS CHISMES</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href={% url 'trailers' %} style="color: white;">Trailers</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href={% url 'peliculas' %} style="color: white;">Peliculas</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href={% url 'series' %} style="color: white;">Series</a>
+          </li>
+        </ul>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel" style='background: black;'>
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">ACCIONES</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+              <li class="nav-item">
+                <a class="navbar-brand" href={% url 'home' %} style="color: white; font-size: 24px;">
+                  <img src="{% static 'mainapp/images/perfil_invertido.png' %}" alt="Logo" width="40" height="34" class="d-inline-block align-text-top">
+                  Cine En Tus Manos
+                </a>
+              </li>
+             
+              <li class="nav-item">
+                <a class="nav-link active" href={% url 'mas_y_mas_chismes' %}>MÁS Y MÁS CHISMES</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href={% url 'trailers' %}>Trailers</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href={% url 'peliculas' %}>Peliculas</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href={% url 'series' %}>Series</a>
+              </li>
+              
+              <hr>
+
+              <li class="nav-item">
+                <a class="nav-link active" href={% url 'login' %}>Iniciar Sesion</a>
+              </li>
+              {% if user.permisos_id == 1 %}
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href={% url 'perfil' %}>Perfil</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'admin_view' %}>Administrador</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'mis_criticas' %}>Mis Criticas</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'criticas_admin' %}>Criticas</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'critica' %} >Realizar Critica</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'registro_usuario' %}>Registro Colaborador</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'editar_eliminar_usuario' %}>Editar - Eliminar Colaborador</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'logout_view' %}>Salir</a>
+                </li>
+                {% elif user.permisos_id == 2 %}
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href={% url 'perfil' %}>Perfil</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'mis_criticas' %}>Mis Criticas</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'critica' %}>Realizar Critica</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'logout_view' %}>Salir</a>
+                </li>
+              {% endif %}
+
+              <hr>
+
+              <li class="nav-item">
+                <a class="nav-link active" href={% url 'nosotros' %}>Acerca de Cine En Tus Manos</a>
+              </li>
+
+            </ul>
+
+            <br>
+
+            <form class="d-flex">
+              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <br>
+    <br>
+
+    <div class="container">
+        <br>
+        <br>
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Footer -->
+    {% if user.permisos_id == 1 or user.permisos_id == 2 %}
+    {% else %}
+      <footer class="bg-dark text-white text-center py-3 w-100">
+        <p>&copy; 2024 Cine En Tus Manos. Todos los derechos reservados.</p>
+        <div class="social-icons">
+            <a href="https://www.facebook.com/profile.php?id=61559551291820" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/cine_en_tus_manos/" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.youtube.com/@CineEnTusManos" target="_blank"><i class="fab fa-youtube"></i></a>
+            <a href="https://www.tiktok.com/@pepe_mercaddo" target="_blank"><i class="fab fa-tiktok"></i></a>
+            <a href="https://x.com/Pepe_Mercaddo" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="mailto:tuemail@dominio.com" target="_blank"><i class="fas fa-envelope"></i></a>
+            <a href="https://linktr.ee/pepe_mercaddo" target="_blank"><i class="fas fa-link"></i></a>
+        </div>
+      </footer>
+    {% endif %}    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+</body>
+</html>

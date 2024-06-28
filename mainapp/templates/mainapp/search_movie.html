@@ -1,0 +1,50 @@
+<!-- search_movie.html -->
+{% extends 'mainapp/base.html' %}
+
+{% block content %}
+    <h1>Buscar Película</h1>
+    <form id="search-form">
+        <input type="text" id="movie_name" name="movie_name" placeholder="Ingrese el nombre de la película">
+        <button type="button" onclick="searchMovie()">Buscar</button>
+    </form>
+    <div id="search-results"></div>
+
+    <script>
+        function searchMovie() {
+            const movieName = document.getElementById('movie_name').value;
+            fetch('/search_movie/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `movie_name=${movieName}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                const results = data.results;
+                let output = '<ul>';
+                results.forEach(movie => {
+                    output += `<li onclick="selectMovie(${movie.id})">${movie.title}</li>`;
+                });
+                output += '</ul>';
+                document.getElementById('search-results').innerHTML = output;
+            });
+        }
+
+        function selectMovie(movieId) {
+            fetch(`/get_movie_details/?movie_id=${movieId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('id_nombre').value = data.title;
+                document.getElementById('id_sipnosis').value = data.overview;
+                document.getElementById('id_director').value = data.credits.crew.find(person => person.job === 'Director').name;
+                document.getElementById('id_escritor').value = data.credits.crew.find(person => person.job === 'Writer').name;
+                document.getElementById('id_reparto').value = data.credits.cast.map(actor => actor.name).join(', ');
+                document.getElementById('id_ano').value = data.release_date.split('-')[0];
+                document.getElementById('id_pais').value = data.production_countries.map(country => country.name).join(', ');
+                document.getElementById('id_categoria_genero_id').value = data.genres.map(genre => genre.name).join(', ');
+            });
+        }
+    </script>
+{% endblock %}

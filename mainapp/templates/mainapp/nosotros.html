@@ -1,0 +1,66 @@
+{% extends 'mainapp/base.html' %}
+{% load static %} <!-- Cargar el tag static -->
+{% get_media_prefix as media_prefix %} <!-- Obtener el prefijo de medios -->
+
+{% block title %}NOSOTROS{% endblock %}
+
+{% block content %}
+
+<br>
+
+<div class='h1' style='color: white;'>ACERCA DE CINE EN TUS MANOS</div>
+
+<br>
+
+<div class="row">
+    <div class="col-sm-6 mb-3 mb-sm-0">
+        <div class="h1">
+            Misión
+        </div>
+        <div class="h3">
+            Somos un medio independiente, veraz y confiable, donde tanto cinéfilos como consumidores ocasionales pueden encontrar información actual sobre la industria del cine nacional e internacional.
+        </div>
+        <br>
+        <br>
+        <div class="h1">
+            Visión
+        </div>
+        <div class="h3">
+            Convertirnos en el medio de referencia para la información cinematográfica, mejorando continuamente nuestro contenido con la inclusión de entrevistas exclusivas, noticias actualizadas y reportajes detallados relacionados con el séptimo arte.
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col">
+                <div class="card h-100">
+                    <img src="{% static 'mainapp/images/perfil.jpg' %}" class="card-img-top" alt="...">
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100">
+                    <img src="{% static 'mainapp/images/image3.jpg' %}" class="card-img-top" alt="...">
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100">
+                    <img src="{% static 'mainapp/images/perfil_invertido.png' %}" class="card-img-top" alt="...">
+                </div>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="card mb-3">
+            <img src="{% static 'mainapp/images/portada.jpeg' %}" class="card-img-top" alt="...">
+        </div>
+    </div>
+</div>
+
+
+<br>
+<br>
+<br>
+<br>
+
+
+{% endblock %}

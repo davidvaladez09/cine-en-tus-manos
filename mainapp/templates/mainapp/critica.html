@@ -1,0 +1,168 @@
+{% extends 'mainapp/base.html' %}
+{% load form_extras %}
+{% load static %}
+
+{% block title %}CREAR RESEÑA{% endblock %}
+
+{% block content %}
+
+<div class="h1">
+    <a class="navbar-brand" href={% url 'critica' %} style="color: #AAB7B8;">
+        <img src="{% static 'mainapp/images/icon_resena.png' %}" alt="Logo" width="60" height="48" class="d-inline-block align-text-top">
+        CREAR RESEÑA
+    </a>
+</div>
+
+<br>
+
+<div class='h2' style='color: white;'>Bienvenido, {{ nombre }}!</div>
+
+<div class='container'>
+    <br>
+    {% if messages %}
+        <div class="container mt-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="background: #12a15e">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="movie_name" class="form-label">Ingresa Nombre de Película o Serie a Realizar Reseña</label>
+            <input type="text" class="form-control" id="movie_name" name="movie_name">
+            <button type="button" class="btn btn-success" onclick="searchMovie()" style='margin-top: .5rem;'>BUSCAR CONTENIDO</button>
+        </div>
+
+        <div class="row g-2">
+            <div class="col-md">
+                <div class="form-floating">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre Pelicula o Serie</label>
+                        {{ form.nombre|add_attrs:"class=form-control,id=nombre" }}
+                        {{ form.nombre.errors }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="director" class="form-label">Director</label>
+                        {{ form.director|add_attrs:"class=form-control,id=director" }}
+                        {{ form.director.errors }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="escritor" class="form-label">Escritor</label>
+                        {{ form.escritor|add_attrs:"class=form-control,id=escritor" }}
+                        {{ form.escritor.errors }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="form-floating">
+                    <div class="mb-3">
+                        <label for="reparto" class="form-label">Reparto</label>
+                        {{ form.reparto|add_attrs:"class=form-control,id=reparto" }}
+                        {{ form.reparto.errors }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="ano" class="form-label">Año</label>
+                        {{ form.ano|add_attrs:"class=form-control,id=ano" }}
+                        {{ form.ano.errors }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="pais" class="form-label">País</label>
+                        {{ form.pais|add_attrs:"class=form-control,id=pais" }}
+                        {{ form.pais.errors }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="categoria_genero" class="form-label">Categoría / Género</label>
+            {{ form.categoria_genero|add_attrs:"class=form-control,id=categoria_genero" }}
+            {{ form.categoria_genero.errors }}
+        </div>
+
+        <div class="mb-3">
+            <label for="sipnosis" class="form-label">Sinopsis</label>
+            {{ form.sipnosis|add_attrs:"class=form-control,id=sipnosis,style=height:4rem;" }}
+            {{ form.sipnosis.errors }}
+        </div>
+
+        <br>
+        <hr>
+        <br>
+
+        <div class="mb-3">
+            <label for="link_trailer" class="form-label">Selecciona Video de Reseña/ Trailer</label>
+            <input type="file" class="form-control" id="trailer_file" name="trailer_file">
+           
+        </div>
+        <div class="mb-3">
+            <label for="nombre_espanol" class="form-label">Nombre en Español / México</label>
+            {{ form.nombre_espanol|add_attrs:"class=form-control,id=nombre_espanol" }}
+            {{ form.nombre_espanol.errors }}
+        </div>
+        <div class="mb-3">
+            <label for="no_capitulos" class="form-label">Número de Capítulos (Si es una Serie)</label>
+            {{ form.no_capitulos|add_attrs:"class=form-control,id=no_capitulos" }}
+            {{ form.no_capitulos.errors }}
+        </div>
+        <div class="mb-3">
+            <label for="critica" class="form-label">Reseña</label>
+            {{ form.critica|add_attrs:"class=form-control,id=critica,style=height:4rem;" }}
+            {{ form.critica.errors }}
+        </div>
+        <div class="mb-3">
+            <label for="donde_ver" class="form-label">Dónde Ver: Ingresa Las Plataformas Digitales en Dónde se Puede Ver el Contenido</label>
+            {{ form.donde_ver|add_attrs:"class=form-control,id=donde_ver" }}
+            {{ form.donde_ver.errors }}
+        </div>
+        <div class="mb-3">
+            <label for="ruta_foto_critica" class="form-label">Elige la Foto que se Mostrara Junto a la Reseña</label>
+            {{ form.ruta_foto_critica|add_attrs:"class=form-control,id=ruta_foto_critica" }}
+            {{ form.ruta_foto_critica.errors }}
+        </div>
+        <div class="mb-3">
+            <label for="tipo_id" class="form-label">Tipo (Serie o Película)</label>
+            {{ form.tipo|add_attrs:"class=form-control,id=tipo_id" }}
+            {{ form.tipo.errors }}
+        </div>
+        <div class="mb-3">
+            <label for="calificacion" class="form-label">Calificacion (0-10)</label>
+            {{ form.calificacion|add_attrs:"class=form-control,id=calificacion,step=0.01,placeholder=0.00" }}
+            {{ form.calificacion.errors }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">COMPARTIR RESEÑA</button>
+        <br>
+        <br>
+    </form>
+</div>
+
+<script>
+    function searchMovie() {
+        var movieName = document.getElementById('movie_name').value;
+        if (movieName) {
+            fetch(`/search_movie/?name=${movieName}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        document.getElementById('nombre').value = data.nombre;
+                        document.getElementById('sipnosis').value = data.sipnosis;
+                        document.getElementById('director').value = data.director;
+                        document.getElementById('escritor').value = data.escritor;
+                        document.getElementById('reparto').value = data.reparto;
+                        document.getElementById('ano').value = data.ano;
+                        document.getElementById('pais').value = data.pais;
+                        document.getElementById('categoria_genero').value = data.categoria_genero;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    }
+</script>
+
+{% endblock %}

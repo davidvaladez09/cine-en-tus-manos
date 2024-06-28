@@ -1,0 +1,134 @@
+<!-- detalle_critica.html -->
+
+{% extends 'mainapp/base.html' %}
+
+{% block title %}Detalle de Crítica{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card" style="width: 100%; border-radius: 10px;">
+                <img class="card-img-top" src="{{ critica.ruta_foto_critica.url }}" alt="Card image cap" style="border-radius: 10px;">
+                <div class="card-body">
+                    <h5 class="card-title" style="font-weight: bold;">{{ critica.nombre }}</h5>
+                    <p class="card-text">{{ critica.sipnosis }}</p>
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+                <iframe width="560" height="315" src="{{ critica.link_trailer }}" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+            </div>
+            <br>
+            
+            <label for="inputPassword4" style="color: aliceblue; font-weight: bold;">Critica</label>
+            <div class="card">
+                <div class="card-body" style="width: 100%;">
+                    {{ critica.critica }}
+                </div>
+            </div>
+            <br>
+        </div>
+        <div class="col-md-6">
+            <label for="inputPassword4" style="color: aliceblue; font-weight: bold;">Nombre</label>
+            <div class="card">
+                <div class="card-body" style="width: 100%;">
+                    {{ critica.nombre }}
+                </div>
+            </div>
+            <br>
+
+            <label for="inputPassword4" style="color: aliceblue; font-weight: bold;">Director</label>
+            <div class="card">
+                <div class="card-body" style="width: 100%;">
+                    {{ critica.director }}
+                </div>
+            </div>
+            <br>
+            
+            <label for="inputEmail4" style="color: aliceblue; font-weight: bold;">Escritor</label>
+            <div class="card">
+                <div class="card-body" style="width: 100%;">
+                    {{ critica.escritor }}
+                </div>
+            </div>
+            <br>
+
+            <label for="inputPassword4" style="color: aliceblue; font-weight: bold;">Reparto/ Cast</label>
+            <div class="card">
+                <div class="card-body" style="width: 100%;">
+                    {{ critica.reparto }}
+                </div>
+            </div>
+            <br>
+
+            <label for="inputPassword4" style="color: aliceblue; font-weight: bold;">Año</label>
+            <div class="card">
+                <div class="card-body" style="width: 100%;">
+                    {{ critica.ano }}
+                </div>
+            </div>
+            <br>
+
+            <label for="inputPassword4" style="color: aliceblue; font-weight: bold;">Pais</label>
+            <div class="card">
+                <div class="card-body" style="width: 100%;">
+                    {{ critica.pais }}
+                </div>
+            </div>
+            <br>
+
+            <label for="inputPassword4" style="color: aliceblue; font-weight: bold;">Categoria</label>
+            <div class="card">
+                <div class="card-body" style="width: 100%;">
+                    {{ critica.categoria_genero }}
+                </div>
+            </div>
+            <br>
+
+            <label for="inputPassword4" style="color: aliceblue; font-weight: bold;">Numero de Capitulos / Episodios</label>
+            <div class="card">
+                <div class="card-body" style="width: 100%;">
+                    {{ critica.no_capitulos }}
+                </div>
+            </div>
+            <br>
+
+            <label for="inputPassword4" style="color: aliceblue; font-weight: bold;">Donde ver</label>
+            <div class="card">
+                <div class="card-body" style="width: 100%;">
+                    {{ critica.donde_ver }}
+                </div>
+            </div>
+            <br>
+
+            <label for="inputPassword4" style="color: aliceblue; font-weight: bold;">Calificacion por cine en tus manos</label>
+            <div class="card">
+                <div class="card-body" style="width: 100%;">
+                    {% with calificacion=critica.calificacion %}
+                        {% if calificacion is not None %}
+                            {% for i in "x"|ljust:10 %}
+                                {% if forloop.counter0 < calificacion|default:0 %}
+                                    <i class="fa fa-star"></i>
+                                {% elif forloop.counter0 < calificacion|default:0|add:0.5 %}
+                                    <i class="fa fa-star-half-alt"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+            <br>
+            <label for="inputPassword4" style="color: aliceblue; font-weight: bold;">Reseña escrita por</label>
+            <div class="card">
+                <div class="card-body" style="width: 100%;">
+                    {{ critica.user.nombre }}
+                </div>
+            </div>
+            <br>
+            <br>
+        </div>
+    </div>
+{% endblock %}

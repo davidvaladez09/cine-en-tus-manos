@@ -1,0 +1,78 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}INICIO DE SESION{% endblock %}</title>
+  <link rel="icon" href="{% static 'mainapp/images/channels4_profile.jpg' %}" type="image/x-icon">
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/style.login.css' %}">
+
+  <script type="text/javascript">
+    function mostrarPassword(){
+      var cambio = document.getElementById("txtPassword");
+      if(cambio.type == "password"){
+        cambio.type = "text";
+        $('.icon').removeClass('fa fa-eye-slash').addClass('fa fa-eye');
+      }else{
+        cambio.type = "password";
+        $('.icon').removeClass('fa fa-eye').addClass('fa fa-eye-slash');
+      }
+    } 
+
+    $(document).ready(function () {
+      $('#ShowPassword').click(function () {
+        $('#password').attr('type', $(this).is(':checked') ? 'text' : 'password');
+      });
+    });
+  </script>
+</head>
+
+<body style='font-family: oswald; font-size: 18px;'>
+<a href="{% url 'home' %}" style="color: white; font-family: sans-serif; font-size: .8rem; font-weight: bold; margin-left: 2rem; margin-top: 1rem">REGRESAR AL INICIO</a>
+    <div class="wrapper fadeInDown">
+        <div id="formContent">
+            <div class="fadeIn first">
+                <a class="navbar-brand" href="{% url 'home' %}" style="color: white">
+                    <img src="{% static 'mainapp/images/perfil-removebg-preview.png' %}" id="icon" alt="User Icon" />
+                </a>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                {% if messages %}
+                  <div class="alert alert-danger">
+                    {% for message in messages %}
+                      <p>{{ message }}</p>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+                <input type="text" id="email" class="fadeIn second" name="email" placeholder="EMAIL" required>
+                <input id="password" type="password" class="fadeIn third" name="password" placeholder="PASSWORD" required>
+                <div class="input-group-append"> 
+                  <input id="ShowPassword" type="checkbox" style="margin-left: 2.3rem; cursor: pointer;"/><h5 style="margin-left: .5rem; margin-top: .7rem; font-size: .9rem; cursor: pointer; color: white;">  MOSTRAR PASSWORD</h5>
+                </div>
+
+                <a href="{% url 'recuperar_password' %}" style="color: white;">¿Olvidaste la contraseña?</a>
+                &nbsp;
+                <input type="submit" value="Iniciar sesión">
+
+                <div class='h1' style='font-size: .9rem; color: white;'>ES NECESARIO FORMAR PARTE DE</div>
+                <div class='h1' style='font-size: .9rem; color: white;'>'CINE EN TUS MANOS'</div> 
+                <div class='h1' style='font-size: .9rem; color: white;'>PARA TENER UN USUARIO EN LA PLATAFORMA.</div>
+
+            </form>  
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,81 @@
+{% extends 'mainapp/base.html' %}
+
+{% block title %}MIS CRITICAS{% endblock %}
+
+{% block content %}
+
+{% load static %} <!-- Cargar el tag static -->
+{% get_media_prefix as media_prefix %} <!-- Obtener el prefijo de medios -->
+
+<div class="h1">
+    <a class="navbar-brand" href={% url 'criticas_admin' %} style="color: #AAB7B8;">
+        <img src="{% static 'mainapp/images/icon_resena.png' %}" alt="Logo" width="60" height="60" class="d-inline-block align-text-top">
+        CRITICAS COLABORADORES
+    </a>
+</div>
+
+<br>
+
+{% if messages %}
+    <div class="container mb3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="background: #12a15e">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- Formulario de filtro -->
+<div class="dropdown" style="font-family: oswald; font-size: 22px;">
+    <button type="button" class="btn btn-info dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      SELECCIONA UN FILTRO
+    </button>
+
+    <ul class="dropdown-menu">
+        <form method="GET" action="" style="margin: 2rem;">
+            {{ filter_form.as_p }}
+            <button type="submit" class="btn btn-success">Aplicar filtros</button>
+            <a class="btn btn-primary" href="{% url 'criticas_admin' %}" role="button" aria-disabled="true">Limpiar filtros</a>
+        </form>
+    </ul>
+</div>
+
+<br>
+
+
+{% for critica in criticas %}
+    <a href="{% url 'detalle_critica_admin' critica.pk %}" class="card mb-3 text-decoration-none text-reset">
+        <div class="card mb-3" style="color: black;">
+            <!-- Corrección aquí: Eliminar "/media/" extra -->
+            <img src="{{ critica.ruta_foto_critica.url }}" class="card-img-top" alt="..." style="height: 35rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{ critica.nombre }}</h5>
+                <p class="card-text">{{ critica.critica }}</p>
+                <p class="card-text"><small class="text-body-secondary">{{ critica.datetime }}</small></p>
+                <br>
+                <footer class="blockquote-footer"><cite title="Source Title">{{ critica.user.nombre }}</cite></footer>
+            </div>
+            <div class="card-footer text-body-secondary">
+                <label>Calificacion: {{ critica.calificacion }}</label><br>
+                    {% with calificacion=critica.calificacion %}
+                        {% if calificacion is not None %}
+                            {% for i in "x"|ljust:10 %}
+                                {% if forloop.counter0 < calificacion|default:0 %}
+                                    <i class="fa fa-star"></i>
+                                {% elif forloop.counter0 < calificacion|default:0|add:0.5 %}
+                                    <i class="fa fa-star-half-alt"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+            </div>
+        </div>
+    </a>
+    
+{% endfor %}
+
+{% endblock %}

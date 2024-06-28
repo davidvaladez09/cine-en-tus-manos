@@ -1,0 +1,167 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block title %}ADMINISTRADOR{% endblock %}
+
+{% block content %}
+<br>
+
+<div class="h1">
+    <a class="navbar-brand" href={% url 'admin_view' %} style="color: #AAB7B8;">
+        <img src="{% static 'mainapp/images/icon_administrador.png' %}" alt="Logo" width="60" height="48" class="d-inline-block align-text-top">
+        ADMINISTRADOR
+    </a>
+</div>
+
+<br>
+
+<div class='h2' style='color: white;'>Bienvenido, {{ nombre }}!</div>
+
+<br>
+
+<div class="container">
+    <div class="h1">Dashboard</div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="d-grid gap-2">
+                <a type="button" href="{% url 'editar_eliminar_usuario' %}" class="btn btn-success btn-lg">
+                    Cantidad de Colaboradores Registrados        <span class="badge text-bg-secondary">{{ cantidad_usuarios }}</span>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="d-grid gap-2">
+                <a type="button" href="{% url 'criticas_admin' %}" class="btn btn-info btn-lg">
+                    Cantidad de Críticas Realizadas         <span class="badge text-bg-secondary">{{ cantidad_criticas }}</span>
+                </a>
+            </div> 
+        </div>
+    </div>
+
+    <br>
+    <br>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <canvas id="criticasPorUsuario"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="criticasPorFecha"></canvas>
+        </div>
+    </div>
+
+    <br>
+    <br>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <canvas id="tiposCritica"></canvas>
+        </div>
+    </div>
+
+    <br>
+
+</div>
+
+<!-- Incluir Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Gráfica 1: Cantidad de críticas realizadas por usuario
+    const criticasPorUsuarioCtx = document.getElementById('criticasPorUsuario').getContext('2d');
+    const criticasPorUsuarioData = {{ criticas_por_usuario|safe }};
+    const criticasPorUsuarioLabels = criticasPorUsuarioData.map(data => data.nombre);
+    const criticasPorUsuarioCounts = criticasPorUsuarioData.map(data => data.num_criticas);
+
+    new Chart(criticasPorUsuarioCtx, {
+        type: 'bar',
+        data: {
+            labels: criticasPorUsuarioLabels,
+            datasets: [{
+                label: 'Cantidad de Críticas',
+                data: criticasPorUsuarioCounts,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Gráfica 2: Críticas realizadas tomando en cuenta las fechas y horas
+    const criticasPorFechaCtx = document.getElementById('criticasPorFecha').getContext('2d');
+    const criticasPorFechaData = {{ criticas_por_fecha|safe }};
+    const criticasPorFechaLabels = criticasPorFechaData.map(data => data.date);
+    const criticasPorFechaCounts = criticasPorFechaData.map(data => data.num_criticas);
+
+    new Chart(criticasPorFechaCtx, {
+        type: 'line',
+        data: {
+            labels: criticasPorFechaLabels,
+            datasets: [{
+                label: 'Cantidad de Críticas',
+                data: criticasPorFechaCounts,
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Gráfica 3: Cantidad de series, películas, chismes (gráfica de pastel)
+    const tiposCriticaCtx = document.getElementById('tiposCritica').getContext('2d');
+    const tiposCriticaData = {{ tipos|safe }};
+    const tiposCriticaLabels = tiposCriticaData.map(data => data['tipo__descripcion']);
+    const tiposCriticaCounts = tiposCriticaData.map(data => data.count);
+
+    new Chart(tiposCriticaCtx, {
+        type: 'pie',
+        data: {
+            labels: tiposCriticaLabels,
+            datasets: [{
+                label: 'Tipos de Crítica',
+                data: tiposCriticaCounts,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>
+
+{% endblock %}
