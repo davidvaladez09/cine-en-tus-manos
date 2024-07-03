@@ -10,8 +10,8 @@ from django.utils import timezone
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.serializers.json import DjangoJSONEncoder
-from .models import User, FotosPerfil, Critica, Tipo
-from .forms import UserRegistrationForm, CriticaForm, PerfilForm, EditarCriticaForm, PerfilFormEditar, CriticaFilterForm, CriticaFilterFormWhitFilter
+from .models import User, FotosPerfil, Critica, Tipo, Noticia
+from .forms import UserRegistrationForm, CriticaForm, PerfilForm, EditarCriticaForm, PerfilFormEditar, CriticaFilterForm, CriticaFilterFormWhitFilter, NoticiaForm, NoticiaFilterFormWhitFilter, EditarNoticiaForm
 from .tmdb import search_movie, get_movie_details
 from .decorators import admin_required
 import os
@@ -127,6 +127,9 @@ def admin_view(request):
     # Indicador 2: Cantidad de críticas realizadas
     cantidad_criticas = Critica.objects.count()
 
+    # Indicador 3: Cantidad de noticias realizadas
+    cantidad_noticias = Noticia.objects.count()
+
     # Gráfica 1: Cantidad de críticas realizadas por usuario
     criticas_por_usuario = User.objects.annotate(num_criticas=Count('critica')).values('nombre', 'num_criticas')
 
@@ -147,6 +150,7 @@ def admin_view(request):
     context = {
         'cantidad_usuarios': cantidad_usuarios,
         'cantidad_criticas': cantidad_criticas,
+        'cantidad_noticias': cantidad_noticias,
         'criticas_por_usuario': json.dumps(list(criticas_por_usuario)),
         'criticas_por_fecha': json.dumps(criticas_por_fecha),
         'tipos': json.dumps(list(tipos)),
@@ -191,6 +195,39 @@ def criticas_admin(request):
     }
 
     return render(request, 'mainapp/criticas_admin.html', context)
+
+@admin_required
+def noticias_admin(request):
+    noticias = Noticia.objects.all().order_by('-datetime')
+
+    if request.method == 'GET':
+        filter_form = NoticiaFilterFormWhitFilter(request.GET)
+
+        if filter_form.is_valid():
+            tipo = filter_form.cleaned_data.get('tipo')
+            nombre = filter_form.cleaned_data.get('nombre')
+            fecha_orden = filter_form.cleaned_data.get('fecha_orden')
+
+            if tipo:
+                noticias = noticias.filter(tipo=tipo)
+
+            if nombre:
+                noticias = noticias.filter(nombre__icontains=nombre)
+
+            if fecha_orden == 'asc':
+                noticias = noticias.order_by('datetime')
+            elif fecha_orden == 'desc':
+                noticias = noticias.order_by('-datetime')
+
+    else:
+        filter_form = CriticaFilterForm()
+
+    context = {
+        'noticias': noticias,
+        'filter_form': filter_form,
+    }
+
+    return render(request, 'mainapp/noticias_admin.html', context)
 
 ''' --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- '''
 
@@ -368,6 +405,34 @@ def trailers(request):
 
     return render(request, 'mainapp/trailers.html', context)
 
+def noticias(request):
+    noticias = Noticia.objects.all().order_by('-datetime')
+
+    if request.method == 'GET':
+        filter_form = NoticiaFilterFormWhitFilter(request.GET)
+
+        if filter_form.is_valid():
+            nombre = filter_form.cleaned_data.get('nombre')
+            fecha_orden = filter_form.cleaned_data.get('fecha_orden')
+
+            if nombre:
+                noticias = noticias.filter(nombre__icontains=nombre)
+
+            if fecha_orden == 'asc':
+                noticias = noticias.order_by('datetime')
+            elif fecha_orden == 'desc':
+                noticias = noticias.order_by('-datetime')
+
+    else:
+        filter_form = CriticaFilterForm()
+
+    context = {
+        'noticias': noticias,
+        'filter_form': filter_form,
+    }
+
+    return render(request, 'mainapp/noticias.html', context)
+
 def publicar_critica(request):
     return render(request, 'mainapp/publicar_critica.html')
 
@@ -406,7 +471,7 @@ def login_view(request):
                 if tipo_permiso == 1:
                     next_url = request.GET.get('next', 'admin_view')
                 else:
-                    next_url = request.GET.get('next', 'perfil')
+                    next_url = request.GET.get('next', 'mis_criticas')
 
                 return redirect(next_url)
             else:
@@ -534,13 +599,7 @@ def critica(request):
             critica = form.save(commit=False)
             critica.user = request.user  # Asigna el usuario logueado
             critica.datetime = timezone.now()  # Asigna la fecha y hora actual
-            # Guardar el archivo de video en la misma ruta que la imagen seleccionada
-            trailer_file = form.cleaned_data['trailer_file']
-            filename = trailer_file.name
-            with open(os.path.join('media', 'review', filename), 'wb+') as destination:
-                for chunk in trailer_file.chunks():
-                    destination.write(chunk)
-            critica.link_trailer = os.path.join('review', filename).replace('\\', '/')
+            
             critica.save()
             messages.success(request, 'RESEÑA PUBLICADA EXITOSAMENTE')  # Mensaje de éxito
             return redirect('critica')
@@ -549,6 +608,29 @@ def critica(request):
     else:
         form = CriticaForm()
     return render(request, 'mainapp/critica.html', {'form': form, 'correo': correo, 'nombre': nombre})
+
+@login_required
+def noticia(request):
+    usuario = request.user.nombre  # Usar el nombre de usuario en lugar de first_name
+    if request.method == 'POST':
+        form = NoticiaForm(request.POST, request.FILES)
+        if form.is_valid():
+            noticia = form.save(commit=False)
+            noticia.user = request.user  # Asignar el usuario actual
+            noticia.datetime = timezone.now()  # Asigna la fecha y hora actual
+            noticia.save()
+            messages.success(request, 'NOTICIA PUBLICADA EXITOSAMENTE')  # Mensaje de éxito
+            return redirect('noticia')  # Redirigir usando el nombre de la URL
+        else:
+            messages.error(request, 'ERROR AL PUBLICAR NOTICIA. REVISA LOS DATOS INGRESADOS.')  # Mensaje de error
+    else:
+        form = NoticiaForm()
+    
+    context = {
+        'form': form,
+        'usuario': usuario,  # Cambiar a 'usuario' para coincidir con la plantilla
+    }
+    return render(request, 'mainapp/noticia.html', context)
 
 @login_required
 def get_movie_details_view(request):
@@ -596,12 +678,44 @@ def mis_criticas(request):
 
     return render(request, 'mainapp/mis_criticas.html', context)
 
+
+# Vista que muestras todas las criticas realizadas por el usuario
+@login_required
+def mis_noticias(request):
+    # Obtener el usuario actual que ha iniciado sesión
+    usuario = request.user
+    # Filtrar las críticas del usuario actual
+    noticias = Noticia.objects.filter(user=usuario).order_by('-datetime')
+    if request.method == 'GET':
+        filter_form = NoticiaFilterFormWhitFilter(request.GET)
+
+        if filter_form.is_valid():
+            nombre = filter_form.cleaned_data.get('nombre')
+            fecha_orden = filter_form.cleaned_data.get('fecha_orden')
+
+            if nombre:
+                criticas = criticas.filter(nombre__icontains=nombre)
+
+            if fecha_orden == 'asc':
+                criticas = criticas.order_by('datetime')
+            elif fecha_orden == 'desc':
+                criticas = criticas.order_by('-datetime')
+
+    else:
+        filter_form = CriticaFilterForm()
+
+    context = {
+        'noticias': noticias,
+        'filter_form': filter_form,
+    }
+
+    return render(request, 'mainapp/mis_noticias.html', context)
+
 # Vista que muestra los detalles de la critica y pelicula
 @login_required
 def detalle_critica_admin(request, pk):
     critica = get_object_or_404(Critica, pk=pk)
     fotos_perfil = FotosPerfil.objects.all()
-    current_link_trailer = critica.link_trailer  # Guardar el valor actual del link del tráiler
 
     if request.method == 'POST':
         form = EditarCriticaForm(request.POST, request.FILES, instance=critica)
@@ -611,15 +725,6 @@ def detalle_critica_admin(request, pk):
             # Manejar la ruta de la foto de la crítica
             if 'ruta_foto_critica' in request.FILES:
                 critica.ruta_foto_critica = request.FILES['ruta_foto_critica']
-
-            # Manejar el archivo del tráiler
-            if 'trailer_file' in request.FILES:
-                trailer_file = request.FILES['trailer_file']
-                trailer_path = default_storage.save(os.path.join('review', trailer_file.name), trailer_file)
-                critica.link_trailer = default_storage.url(trailer_path)
-            else:
-                # Mantener el archivo de tráiler existente si no se selecciona uno nuevo
-                critica.link_trailer = current_link_trailer
 
             critica.save()
             messages.success(request, 'Crítica editada exitosamente.')
@@ -631,7 +736,32 @@ def detalle_critica_admin(request, pk):
 
     return render(request, 'mainapp/detalle_critica_admin.html', {'critica': critica, 'usuario': request.user, 'form': form, 'fotos_perfil': fotos_perfil})
 
-# Vista para eliminar la critica
+@login_required
+def detalle_noticia_admin(request, pk):
+    noticia = get_object_or_404(Noticia, pk=pk)
+    fotos_perfil = FotosPerfil.objects.all()
+
+    if request.method == 'POST':
+        form = EditarNoticiaForm(request.POST, request.FILES, instance=noticia)
+        if form.is_valid():
+            noticia = form.save(commit=False)
+
+            # Manejar la ruta de la foto de la crítica
+            if 'ruta_foto_critica' in request.FILES:
+                noticia.ruta_foto_critica = request.FILES['ruta_foto_critica']
+
+            noticia.save()
+            messages.success(request, 'Noticia editada exitosamente.')
+            return redirect('detalle_noticia_admin', pk=pk)
+        else:
+            messages.error(request, 'Error al editar noticia. Verifica los datos ingresados.')
+    else:
+        form = EditarNoticiaForm(instance=noticia)
+
+    return render(request, 'mainapp/detalle_noticia_admin.html', {'noticia': noticia, 'usuario': request.user, 'form': form, 'fotos_perfil': fotos_perfil})
+
+
+# Vista para eliminar critica
 @login_required
 def eliminar_critica(request, pk):
     critica = get_object_or_404(Critica, pk=pk)
@@ -651,3 +781,30 @@ def eliminar_critica(request, pk):
         form = EditarCriticaForm(instance=critica)
     
     return render(request, 'mainapp/detalle_critica_admin.html', {'form': form, 'critica': critica})
+
+
+# Vista para eliminar noticia
+@login_required
+def eliminar_noticia(request, pk):
+    noticia = get_object_or_404(Noticia, pk=pk)
+    
+    if request.method == 'POST':
+        if 'eliminar' in request.POST:
+            noticia.delete()
+            messages.success(request, 'Noticia eliminada exitosamente.')
+            return redirect('mis_noticias')  # Cambia esto al nombre correcto de tu vista de lista de críticas
+        
+        form = EditarNoticiaForm(request.POST, request.FILES, instance=noticia)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Cambios guardados exitosamente.')
+            return redirect('detalle_noticia_admin', pk=noticia.pk)
+    else:
+        form = EditarNoticiaForm(instance=noticia)
+    
+    return render(request, 'mainapp/detalle_noticia_admin.html', {'form': form, 'noticia': noticia})
+
+def calendario(request):
+    # Obtener el usuario actual que ha iniciado sesión
+    usuario = request.user.nombre
+    return render(request, 'mainapp/calendario.html', {'usuario': usuario})

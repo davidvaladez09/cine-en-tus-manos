@@ -1,0 +1,84 @@
+{% extends 'mainapp/base.html' %}
+
+{% block title %}NOTICIAS ADMIN{% endblock %}
+
+{% block content %}
+
+{% load static %} <!-- Cargar el tag static -->
+{% get_media_prefix as media_prefix %} <!-- Obtener el prefijo de medios -->
+
+<div class="h1">
+    <a class="navbar-brand" href={% url 'noticias_admin' %} style="color: #AAB7B8;">
+        <img src="{% static 'mainapp/images/icon_noticias.png' %}" alt="Logo" width="60" height="48" class="d-inline-block align-text-top">
+       NOTICIAS ADMIN
+    </a>
+</div>
+
+<br>
+
+<!-- Formulario de filtro -->
+<div class="dropdown" style="font-family: oswald; font-size: 22px;">
+    <button type="button" class="btn btn-outline-warning dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false" style:"background: #0a2fcc">
+      SELECCIONA UN FILTRO
+    </button>
+
+    <ul class="dropdown-menu">
+        <form method="GET" action="" style="margin: 2rem;">
+            {{ filter_form.as_p }}
+            <button type="submit" class="btn btn-success">Aplicar filtros</button>
+            <a class="btn btn-primary" href="{% url 'noticias' %}" role="button" aria-disabled="true">Limpiar filtros</a>
+        </form>
+    </ul>
+</div>
+
+<br>
+
+<div class="row">
+    <div class="col-sm-6 mb-3 mb-sm-0">
+        {% for noticia in noticias|slice:"::2" %}
+            <a href="{% url 'detalle_noticia_admin' noticia.pk %}" class="card mb-3 text-decoration-none text-reset">
+                <div class="card mb-3" style="max-width: 640px; color: black;">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="{{ noticia.ruta_foto_critica.url }}" class="card-img-top" alt="...">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ noticia.nombre }}</h5>
+                                <p class="card-text">{{ noticia.descripcion }}</p>
+                            </div>
+                        </div>
+                        <br>
+                        <p class="card-text"><small class="text-body-secondary" style:"margin: 1rem;">{{ noticia.datetime }}</small></p>
+                        <footer class="blockquote-footer">Escrita por: <cite title="Source Title"> {{ noticia.user.nombre }}</cite></footer>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="col-sm-6">
+        {% for noticia in noticias|slice:"1::2" %}
+            <a href="{% url 'detalle_noticia_admin' noticia.pk %}" class="card mb-3 text-decoration-none text-reset">
+                <div class="card mb-3" style="max-width: 640px; color: black;">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="{{ noticia.ruta_foto_critica.url }}" class="card-img-top" alt="...">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ noticia.nombre }}</h5>
+                                <p class="card-text">{{ noticia.descripcion }}</p>
+                                <p class="card-text"><small class="text-body-secondary">{{ noticia.datetime }}</small></p>
+                                <br>
+                            </div>
+                        </div>
+                        <footer class="blockquote-footer">Escrita por: <cite title="Source Title"> {{ noticia.user.nombre }}</cite></footer>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

@@ -42,7 +42,7 @@
     <nav class="navbar navbar-dark bg-black fixed-top">
       <div class="container-fluid">
         <a class="navbar-brand" href={% url 'home' %} style="color: white; font-size: 30px;">
-          <img src="{% static 'mainapp/images/perfil_invertido.png' %}" alt="Logo" width="60" height="48" class="d-inline-block align-text-top">
+          <img src="{% static 'mainapp/images/logo_invertido.png' %}" alt="Logo" width="60" height="60" class="d-inline-block align-text-top">
           Cine En Tus Manos
         </a>
 
@@ -58,6 +58,9 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href={% url 'series' %} style="color: white;">Series</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href={% url 'noticias' %} style="color: white;">Noticias</a>
           </li>
         </ul>
 
@@ -91,6 +94,9 @@
               <li class="nav-item">
                 <a class="nav-link active" href={% url 'series' %}>Series</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link active" href={% url 'noticias' %}>Noticias</a>
+              </li>
               
               <hr>
 
@@ -98,6 +104,9 @@
                 <a class="nav-link active" href={% url 'login' %}>Iniciar Sesion</a>
               </li>
               {% if user.permisos_id == 1 %}
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'calendario' %}>Calemdario</a>
+                </li>
                 <li class="nav-item">
                   <a class="nav-link active" aria-current="page" href={% url 'perfil' %}>Perfil</a>
                 </li>
@@ -114,6 +123,15 @@
                   <a class="nav-link active" href={% url 'critica' %} >Realizar Critica</a>
                 </li>
                 <li class="nav-item">
+                  <a class="nav-link active" href={% url 'noticias_admin' %}>Noticias</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'mis_noticias' %} >Mis Noticias</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'noticia' %} >Realizar Noticia</a>
+                </li>
+                <li class="nav-item">
                   <a class="nav-link active" href={% url 'registro_usuario' %}>Registro Colaborador</a>
                 </li>
                 <li class="nav-item">
@@ -124,6 +142,9 @@
                 </li>
                 {% elif user.permisos_id == 2 %}
                 <li class="nav-item">
+                  <a class="nav-link active" href={% url 'calendario' %}>Calendario</a>
+                </li>
+                <li class="nav-item">
                   <a class="nav-link active" aria-current="page" href={% url 'perfil' %}>Perfil</a>
                 </li>
                 <li class="nav-item">
@@ -131,6 +152,12 @@
                 </li>
                 <li class="nav-item">
                   <a class="nav-link active" href={% url 'critica' %}>Realizar Critica</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'mis_noticias' %} >Mis Noticias</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" href={% url 'noticia' %} >Realizar Noticia</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link active" href={% url 'logout_view' %}>Salir</a>

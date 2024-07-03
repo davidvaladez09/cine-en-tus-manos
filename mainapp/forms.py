@@ -1,5 +1,5 @@
 from django import forms
-from . models import User, FotosPerfil, Permisos, Critica, Tipo
+from . models import User, FotosPerfil, Permisos, Critica, Tipo, Noticia
 
 # Form de registrp de usuario
 class UserRegistrationForm(forms.ModelForm):
@@ -44,8 +44,7 @@ class UploadPhotoForm(forms.ModelForm):
 # Form para realizar reseña
 class CriticaForm(forms.ModelForm):
     tipo = forms.ModelChoiceField(queryset=Tipo.objects.all(), empty_label="SELECCIONA EL TIPO")
-    trailer_file = forms.FileField(label='Selecciona el archivo del tráiler', required=False)
-    
+ 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['tipo'].label_from_instance = lambda obj: obj.descripcion
@@ -56,14 +55,10 @@ class CriticaForm(forms.ModelForm):
                   'link_trailer', 'nombre_espanol', 'no_capitulos', 'critica', 'donde_ver', 'ruta_foto_critica', 'tipo', 'calificacion']
         widgets = {
             'ruta_foto_critica': forms.ClearableFileInput(attrs={'required': True}),
-            'link_trailer': forms.ClearableFileInput(attrs={'required': True}),
         }
 
     def clean(self):
         cleaned_data = super().clean()
-        trailer_file = cleaned_data.get("trailer_file")
-        if not trailer_file:
-            raise forms.ValidationError("Debe seleccionar un archivo de tráiler")
         return cleaned_data
 
 # Form perfil de usuario
@@ -125,11 +120,28 @@ class PerfilFormEditar(forms.ModelForm):
 class EditarCriticaForm(forms.ModelForm):
     tipo = forms.ModelChoiceField(queryset=Tipo.objects.all(), empty_label="SELECCIONA EL TIPO")
     ruta_foto_critica = forms.FileField(label='Selecciona la foto de la crítica', required=False)
-    trailer_file = forms.FileField(label='Selecciona el archivo del tráiler', required=False)
+   
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['tipo'].label_from_instance = lambda obj: obj.descripcion
+
+        self.fields['nombre'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['sipnosis'].widget.attrs.update({'class': 'form-control', 'style': 'height: 10rem; font-size: 22px;'})
+        self.fields['director'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['escritor'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['reparto'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['ano'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['pais'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['categoria_genero'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['nombre_espanol'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['no_capitulos'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['donde_ver'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['tipo'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['calificacion'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['critica'].widget.attrs.update({'class': 'form-control', 'style': 'height: 14rem; font-size: 22px;'})
+        self.fields['ruta_foto_critica'].widget.attrs.update({'type': 'file', 'id':'trailer_file' , 'class': 'form-control',  'style': 'font-size: 22px;'})
+        self.fields['link_trailer'].widget.attrs.update({'class': 'form-control', 'style': 'font-size: 22px;'})
 
     class Meta:
         model = Critica
@@ -165,3 +177,40 @@ class CriticaFilterFormWhitFilter(forms.Form):
         ('desc', 'Fecha descendente'),
     ]
     fecha_orden = forms.ChoiceField(choices=fecha_orden_choices, required=False, label='Orden de fecha')
+
+class NoticiaFilterFormWhitFilter(forms.Form):
+    nombre = forms.CharField(max_length=255, required=False, label='Nombre')
+    fecha_orden_choices = [
+        ('', 'Ordenar por fecha'),
+        ('asc', 'Fecha ascendente'),
+        ('desc', 'Fecha descendente'),
+    ]
+    fecha_orden = forms.ChoiceField(choices=fecha_orden_choices, required=False, label='Orden de fecha')
+
+
+class NoticiaForm(forms.ModelForm):
+    class Meta:
+        model = Noticia
+        fields = ['ruta_foto_critica', 'nombre', 'descripcion']
+        widgets = {
+            'descripcion': forms.Textarea(attrs={'rows': 4}),  # Ajustar según tus preferencias de diseño
+        }
+
+
+# Form para editar critica 
+class EditarNoticiaForm(forms.ModelForm):
+    ruta_foto_critica = forms.FileField(label='Selecciona la foto de la noticia', required=False)
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['nombre'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['descripcion'].widget.attrs.update({'class': 'form-control', 'style': 'height: 14rem; font-size: 22px;'})
+        self.fields['ruta_foto_critica'].widget.attrs.update({'type': 'file', 'id':'trailer_file' , 'class': 'form-control',  'style': 'font-size: 22px;'})
+
+    class Meta:
+        model = Noticia
+        fields = ['nombre', 'descripcion', 'ruta_foto_critica']
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        return cleaned_data

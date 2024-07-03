@@ -29,7 +29,7 @@
 
 <!-- Formulario de filtro -->
 <div class="dropdown" style="font-family: oswald; font-size: 22px;">
-    <button type="button" class="btn btn-info dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <button type="button" class="btn btn-outline-warning dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false" style:"background: #0a2fcc">
       SELECCIONA UN FILTRO
     </button>
 
@@ -44,38 +44,85 @@
 
 <br>
 
+<div class="row">
+    <div class="col-sm-6 mb-3 mb-sm-0">
+        {% for critica in criticas|slice:"::2" %}
+            <a href="{% url 'detalle_critica_admin' critica.pk %}" class="text-decoration-none text-reset">
+                <div class="card mb-3" style="max-width: 640px; color: black;">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="{{ critica.ruta_foto_critica.url }}" class="card-img-top" alt="...">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ critica.nombre }}</h5>
+                                <p class="card-text">{{ critica.critica }}</p>
+                            </div>
+                        </div>
+                        <br>
+                        <p class="card-text"><small class="text-body-secondary" style:"margin: 1rem;">{{ critica.datetime }}</small></p>
+                        <footer class="blockquote-footer">Escrita por: <cite title="Source Title"> {{ critica.user.nombre }}</cite></footer>
+                        <div class="card-footer text-body-secondary">
+                            <label>Calificación: {{ critica.calificacion }}</label><br>
+                            {% if critica.calificacion %}
+                                {% with calificacion=critica.calificacion %}
+                                    {% for i in "x"|ljust:10 %}
+                                        {% if forloop.counter0 < calificacion %}
+                                            <i class="fa fa-star"></i>
+                                        {% elif forloop.counter0 < calificacion|add:'0.5' and not calificacion|floatformat:"0" == calificacion %}
+                                            <i class="fa fa-star-half-alt"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endwith %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
 
-{% for critica in criticas %}
-    <a href="{% url 'detalle_critica_admin' critica.pk %}" class="card mb-3 text-decoration-none text-reset">
-        <div class="card mb-3" style="color: black;">
-            <!-- Corrección aquí: Eliminar "/media/" extra -->
-            <img src="{{ critica.ruta_foto_critica.url }}" class="card-img-top" alt="..." style="height: 35rem;">
-            <div class="card-body">
-                <h5 class="card-title">{{ critica.nombre }}</h5>
-                <p class="card-text">{{ critica.critica }}</p>
-                <p class="card-text"><small class="text-body-secondary">{{ critica.datetime }}</small></p>
-                <br>
-                <footer class="blockquote-footer"><cite title="Source Title">{{ critica.user.nombre }}</cite></footer>
-            </div>
-            <div class="card-footer text-body-secondary">
-                <label>Calificacion: {{ critica.calificacion }}</label><br>
-                    {% with calificacion=critica.calificacion %}
-                        {% if calificacion is not None %}
-                            {% for i in "x"|ljust:10 %}
-                                {% if forloop.counter0 < calificacion|default:0 %}
-                                    <i class="fa fa-star"></i>
-                                {% elif forloop.counter0 < calificacion|default:0|add:0.5 %}
-                                    <i class="fa fa-star-half-alt"></i>
-                                {% else %}
-                                    <i class="far fa-star"></i>
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-            </div>
-        </div>
-    </a>
-    
-{% endfor %}
+    <div class="col-sm-6">
+        {% for critica in criticas|slice:"1::2" %}
+            <a href="{% url 'detalle_critica_admin' critica.pk %}" class="text-decoration-none text-reset">
+                <div class="card mb-3" style="max-width: 640px; color: black;">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="{{ critica.ruta_foto_critica.url }}" class="card-img-top" alt="...">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ critica.nombre }}</h5>
+                                <p class="card-text">{{ critica.critica }}</p>
+                                <p class="card-text"><small class="text-body-secondary">{{ critica.datetime }}</small></p>
+                                <br>
+                            </div>
+                        </div>
+                        <footer class="blockquote-footer">Escrita por: <cite title="Source Title"> {{ critica.user.nombre }}</cite></footer>
+                        <div class="card-footer text-body-secondary">
+                            <label>Calificación: {{ critica.calificacion }}</label><br>
+                            {% if critica.calificacion %}
+                                {% with calificacion=critica.calificacion %}
+                                    {% for i in "x"|ljust:10 %}
+                                        {% if forloop.counter0 < calificacion %}
+                                            <i class="fa fa-star"></i>
+                                        {% elif forloop.counter0 < calificacion|add:'0.5' and not calificacion|floatformat:"0" == calificacion %}
+                                            <i class="fa fa-star-half-alt"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endwith %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+</div>
+
 
 {% endblock %}

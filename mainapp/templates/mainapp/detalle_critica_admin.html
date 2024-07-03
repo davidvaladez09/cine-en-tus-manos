@@ -33,87 +33,6 @@
                 <iframe width="560" height="315" src="{{ critica.link_trailer }}" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
             </div>
             <br>
-            
-            <label for="critica" style="color: aliceblue; font-weight: bold;">Crítica</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ form.critica }}
-                </div>
-            </div>
-            <br>
-        </div>
-        <div class="col-md-6">
-            <label for="nombre" style="color: aliceblue; font-weight: bold;">Nombre</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ form.nombre }}
-                </div>
-            </div>
-            <br>
-
-            <label for="director" style="color: aliceblue; font-weight: bold;">Director</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ form.director }}
-                </div>
-            </div>
-            <br>
-            
-            <label for="escritor" style="color: aliceblue; font-weight: bold;">Escritor</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ form.escritor }}
-                </div>
-            </div>
-            <br>
-
-            <label for="reparto" style="color: aliceblue; font-weight: bold;">Reparto/ Cast</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ form.reparto }}
-                </div>
-            </div>
-            <br>
-
-            <label for="ano" style="color: aliceblue; font-weight: bold;">Año</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ form.ano }}
-                </div>
-            </div>
-            <br>
-
-            <label for="pais" style="color: aliceblue; font-weight: bold;">País</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ form.pais }}
-                </div>
-            </div>
-            <br>
-
-            <label for="categoria_genero" style="color: aliceblue; font-weight: bold;">Categoría</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ form.categoria_genero }}
-                </div>
-            </div>
-            <br>
-
-            <label for="donde_ver" style="color: aliceblue; font-weight: bold;">Dónde ver</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ form.donde_ver }}
-                </div>
-            </div>
-            <br>
-
-            <label for="calificacion" style="color: aliceblue; font-weight: bold;">Calificación por cine en tus manos</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ form.calificacion }}
-                </div>
-            </div>
-            <br>
             <label for="ruta_foto_critica" style="color: aliceblue; font-weight: bold;">Foto de crítica</label>
             <div class="card">
                 <div class="card-body" style="width: 100%;">
@@ -124,36 +43,84 @@
             </div>
             <br>
             <label for="trailer_file" style="color: aliceblue; font-weight: bold;">Archivo de tráiler</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ form.trailer_file }}
-                    {% if critica.link_trailer %}
-                    <br>
-                    <small class="form-text text-muted">Archivo actual: <a href="{{ critica.link_trailer }}">{{ critica.link_trailer }}</a></small>
-                    {% endif %}
-                </div>
+            <div class="mb-3">
+                {{ form.link_trailer }}
             </div>
-
+        </div>
+        <div class="col-md-6">
+            <label for="critica" style="color: aliceblue; font-weight: bold;">Crítica</label>
+            <div class="mb-3">
+                {{ form.critica }}
+            </div>
             <br>
+
+            <label for="nombre" style="color: aliceblue; font-weight: bold;">Nombre</label>
+            <div class="mb-3">
+                {{ form.nombre }}
+            </div>
+            <br>
+
+            <label for="director" style="color: aliceblue; font-weight: bold;">Director</label>
+            <div class="mb-3">
+                {{ form.director }}
+            </div>
+            <br>
+            
+            <label for="escritor" style="color: aliceblue; font-weight: bold;">Escritor</label>
+            <div class="mb-3">
+                {{ form.escritor }}
+            </div>
+            <br>
+
+            <label for="reparto" style="color: aliceblue; font-weight: bold;">Reparto/ Cast</label>
+            <div class="mb-3">
+                {{ form.reparto }}
+            </div>
+            <br>
+
+            <label for="ano" style="color: aliceblue; font-weight: bold;">Año</label>
+            <div class="mb-3">
+                {{ form.ano }}
+            </div>
+            <br>
+
+            <label for="pais" style="color: aliceblue; font-weight: bold;">País</label>
+            <div class="mb-3">
+                {{ form.pais }}
+            </div>
+            <br>
+
+            <label for="categoria_genero" style="color: aliceblue; font-weight: bold;">Categoría</label>
+            <div class="mb-3">
+                {{ form.categoria_genero }}
+            </div>
+            <br>
+
+            <label for="donde_ver" style="color: aliceblue; font-weight: bold;">Dónde ver</label>
+            <div class="mb-3">
+                {{ form.donde_ver }}
+            </div>
+            <br>
+
+            <label for="calificacion" style="color: aliceblue; font-weight: bold;">Calificación por cine en tus manos</label>
+            <div class="mb-3">
+                {{ form.calificacion }}
+            </div>
+            <br>
+
             <label for="tipo" style="color: aliceblue; font-weight: bold;">Tipo</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ form.tipo }}
-                </div>
+            <div class="mb-3">
+                {{ form.tipo }}
             </div>
             <br>
             <label for="nombre_espanol" style="color: aliceblue; font-weight: bold;">Nombre en español</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ form.nombre_espanol }}
-                </div>
+            <div class="mb-3">
+                {{ form.nombre_espanol }}
             </div>
             <br>
             <label for="no_capitulos" style="color: aliceblue; font-weight: bold;">Número de capítulos</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ form.no_capitulos }}
-                </div>
+            <div class="mb-3">
+                {{ form.no_capitulos }}
             </div>
             <br>
             

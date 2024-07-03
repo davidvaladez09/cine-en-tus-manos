@@ -97,9 +97,9 @@
 
         <div class="mb-3">
             <label for="link_trailer" class="form-label">Selecciona Video de Reseña/ Trailer</label>
-            <input type="file" class="form-control" id="trailer_file" name="trailer_file">
-           
+            {{ form.link_trailer|add_attrs:"class=form-control,id=sipnosis" }}
         </div>
+        
         <div class="mb-3">
             <label for="nombre_espanol" class="form-label">Nombre en Español / México</label>
             {{ form.nombre_espanol|add_attrs:"class=form-control,id=nombre_espanol" }}

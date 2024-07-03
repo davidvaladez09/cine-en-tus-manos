@@ -76,6 +76,7 @@ class User(AbstractBaseUser):
 class Critica(models.Model):
     id = models.AutoField(primary_key=True)
     ruta_foto_critica = models.ImageField(upload_to='review/')
+    #ruta_foto_critica = models.ImageField(upload_to='review/', default='path/to/default/image.jpg')
     
     nombre = models.CharField(max_length=255)
     sipnosis = models.TextField()
@@ -86,7 +87,7 @@ class Critica(models.Model):
     pais = models.CharField(max_length=100)
     categoria_genero = models.CharField(max_length=255, blank=True, null=True)
 
-    link_trailer = models.URLField(blank=True, null=True)
+    link_trailer = models.CharField(max_length=255, blank=True, null=True)
     nombre_espanol = models.CharField(max_length=255, blank=True, null=True)
     no_capitulos = models.IntegerField(blank=True, null=True)
     critica = models.TextField()
@@ -98,9 +99,20 @@ class Critica(models.Model):
 
     calificacion = models.FloatField(blank=True, null=True)
 
-    
 
 class FotosCritica(models.Model):
     id = models.AutoField(primary_key=True)
     direccion = models.CharField(max_length=100)
     critica = models.ForeignKey(Critica, on_delete=models.CASCADE)
+
+
+class Noticia(models.Model):
+    id = models.AutoField(primary_key=True)
+    ruta_foto_critica = models.ImageField(upload_to='review/')
+    nombre = models.CharField(max_length=255)
+    descripcion = models.TextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Cambiado de id_user a user
+    datetime = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.nombre

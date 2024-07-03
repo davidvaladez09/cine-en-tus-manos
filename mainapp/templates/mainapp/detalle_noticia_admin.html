@@ -1,0 +1,85 @@
+{% extends 'mainapp/base.html' %}
+
+{% block title %}Detalle de Noticia{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+    <div class="container mb-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="background: #12a15e">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card" style="width: 100%; border-radius: 10px;">
+                <img class="card-img-top" src="{{ noticia.ruta_foto_critica.url }}" alt="Card image cap" style="border-radius: 10px;">
+            </div>
+            <br><br>
+        </div>
+        <div class="col-md-6">
+            <label for="descripcion" style="color: aliceblue; font-weight: bold;">Noticia</label>
+            <div class="mb-3">
+                {{ form.descripcion }}
+            </div>
+            <br>
+            <label for="nombre" style="color: aliceblue; font-weight: bold;">Nombre</label>
+            <div class="mb-3">
+                {{ form.nombre }}
+            </div>
+            <br>
+            <label for="ruta_foto_critica" style="color: aliceblue; font-weight: bold;">Selecciona Foto de la Noticia</label>
+            <div class="card">
+                <div class="card-body" style="width: 100%;">
+                    {{ form.ruta_foto_critica }}
+                </div>
+            </div>
+            <br>
+            <button type="submit" class="btn btn-success">Guardar Cambios</button>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">Eliminar Noticia</button>
+            <br><br>
+        </div>
+    </div>
+</form>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if messages %}
+                    <div class="container mb-3">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                ¿Estás seguro de que deseas eliminar esta noticia?
+            </div>
+            <div class="modal-footer">
+                <form method="POST" action="{% url 'eliminar_noticia' noticia.pk %}">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" name="eliminar" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

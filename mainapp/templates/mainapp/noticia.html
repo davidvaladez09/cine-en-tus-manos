@@ -1,0 +1,58 @@
+{% extends 'mainapp/base.html' %}
+{% load form_extras %}
+{% load static %}
+
+{% block title %}CREAR NOTICIA{% endblock %}
+
+{% block content %}
+
+<div class="h1">
+    <a class="navbar-brand" href={% url 'noticia' %} style="color: #AAB7B8;">
+        <img src="{% static 'mainapp/images/icon_resena.png' %}" alt="Logo" width="60" height="48" class="d-inline-block align-text-top">
+        CREAR NOTICIA
+    </a>
+</div>
+
+<br>
+
+<div class='h2' style='color: white;'>Bienvenido, {{ usuario }}!</div>
+
+<div class='container'>
+    <br>
+    {% if messages %}
+        <div class="container mt-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="background: #12a15e">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <br>
+        <hr>
+        <br>
+
+        <div class="mb-3">
+            <label for="nombre_espanol" class="form-label">Nombre de la Noticia</label>
+            {{ form.nombre|add_attrs:"class=form-control,id=nombre_espanol" }}
+        </div>
+        <div class="mb-3">
+            <label for="critica" class="form-label">Reseña</label>
+            {{ form.descripcion|add_attrs:"class=form-control,id=critica,style=height:4rem;" }}
+        </div>
+        <div class="mb-3">
+            <label for="ruta_foto_critica" class="form-label">Selecciona Foto de Noticia</label>
+            {{ form.ruta_foto_critica|add_attrs:"class=form-control,id=ruta_foto_critica" }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">COMPARTIR RESEÑA</button>
+        <br>
+        <br>
+    </form>
+</div>
+
+{% endblock %}
