@@ -1,43 +1,68 @@
 {% extends 'mainapp/base.html' %}
 
-{% block title %}CALENDARIO DE ACTIVIDADES{% endblock %}
-
-<!-- FullCalendar CSS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.css" rel="stylesheet">
+{% block title %}Calendario{% endblock %}
 
 {% block content %}
 
-{% load static %} <!-- Cargar el tag static -->
-{% get_media_prefix as media_prefix %} <!-- Obtener el prefijo de medios -->
+{% load static %}
 
 <div class="h1">
     <a class="navbar-brand" href={% url 'calendario' %} style="color: #AAB7B8;">
-        <img src="{% static 'mainapp/images/icon_calendario.png' %}" alt="Logo" width="60" height="48" class="d-inline-block align-text-top">
-       CALENDARIO DE ACTIVIDADES
+        <img src="{% static 'mainapp/images/icon_calendario.png' %}" alt="Logo" width="60" height="60" class="d-inline-block align-text-top">
+        CALENDARIO DE ACTIVIDADES
     </a>
+    <br>
+    <div class='h2' style='color: white;'>Bienvenido, {{ nombre }}!</div>
 </div>
 
-
 <br>
 
-<div class='h2' style='color: white;'>Bienvenido, {{ usuario }}!</div>
-
-<br>
 
 <div id="calendar"></div>
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<!-- Bootstrap JS -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<!-- FullCalendar JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.js"></script>
+<!-- Modal para mostrar la información de la actividad -->
+<div class="modal fade" id="detalleActividadModal" tabindex="-1" aria-labelledby="detalleActividadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detalleActividadModalLabel">Detalles de la Actividad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="detalleActividadContainer">
+                    <!-- Aquí se mostrará la información de la actividad -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            height: '100%'
+            events: [
+                {% for actividad in actividades %}
+                {
+                    title: '{{ actividad.descripcion }}',
+                    start: '{{ actividad.datetime|date:"Y-m-d" }}',
+                    url: "{% url 'detalle_actividad' actividad.pk %}"
+                },
+                {% endfor %}
+            ],
+            eventClick: function(info) {
+                info.jsEvent.preventDefault();
+                var actividadUrl = info.event.url;
+                
+                // Cargar la información de la actividad mediante AJAX
+                fetch(actividadUrl)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('detalleActividadContainer').innerHTML = html;
+                        $('#detalleActividadModal').modal('show');
+                    });
+            }
         });
         calendar.render();
     });

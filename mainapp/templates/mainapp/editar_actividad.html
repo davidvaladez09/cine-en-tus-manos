@@ -1,0 +1,10 @@
+
+<div class="container">
+    <h2>Editar Actividad</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    </form>
+</div>
+

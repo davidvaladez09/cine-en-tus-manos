@@ -116,3 +116,13 @@ class Noticia(models.Model):
 
     def __str__(self):
         return self.nombre
+
+class Actividad(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    descripcion = models.TextField()
+    datetime = models.DateField()
+    estado = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.descripcion} - {self.user.username}"

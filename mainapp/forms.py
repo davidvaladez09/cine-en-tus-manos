@@ -1,5 +1,5 @@
 from django import forms
-from . models import User, FotosPerfil, Permisos, Critica, Tipo, Noticia
+from . models import User, FotosPerfil, Permisos, Critica, Tipo, Noticia, Actividad
 
 # Form de registrp de usuario
 class UserRegistrationForm(forms.ModelForm):
@@ -214,3 +214,22 @@ class EditarNoticiaForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         return cleaned_data
+
+class ActividadForm(forms.ModelForm):
+    class Meta:
+        model = Actividad
+        fields = ['user', 'descripcion', 'datetime']
+        widgets = {
+            'datetime': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+class EditarActividadForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = Actividad
+        fields = ['user', 'descripcion', 'datetime', 'estado']
+        widgets = {
+            'datetime': forms.DateInput(attrs={'type': 'date'}),
+        }

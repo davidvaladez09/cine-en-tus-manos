@@ -7,11 +7,14 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Count
 from django.utils import timezone
+from django.urls import reverse
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.serializers.json import DjangoJSONEncoder
-from .models import User, FotosPerfil, Critica, Tipo, Noticia
-from .forms import UserRegistrationForm, CriticaForm, PerfilForm, EditarCriticaForm, PerfilFormEditar, CriticaFilterForm, CriticaFilterFormWhitFilter, NoticiaForm, NoticiaFilterFormWhitFilter, EditarNoticiaForm
+from django.core.serializers import serialize
+from django.views.decorators.http import require_GET
+from .models import User, FotosPerfil, Critica, Tipo, Noticia, Actividad
+from .forms import UserRegistrationForm, CriticaForm, PerfilForm, EditarCriticaForm, PerfilFormEditar, CriticaFilterForm, CriticaFilterFormWhitFilter, NoticiaForm, NoticiaFilterFormWhitFilter, EditarNoticiaForm, ActividadForm, EditarActividadForm
 from .tmdb import search_movie, get_movie_details
 from .decorators import admin_required
 import os
@@ -130,6 +133,9 @@ def admin_view(request):
     # Indicador 3: Cantidad de noticias realizadas
     cantidad_noticias = Noticia.objects.count()
 
+    # Indicador 4: Cantidad de actividades realizadas
+    cantidad_actividades = Actividad.objects.count()
+
     # Gráfica 1: Cantidad de críticas realizadas por usuario
     criticas_por_usuario = User.objects.annotate(num_criticas=Count('critica')).values('nombre', 'num_criticas')
 
@@ -151,6 +157,7 @@ def admin_view(request):
         'cantidad_usuarios': cantidad_usuarios,
         'cantidad_criticas': cantidad_criticas,
         'cantidad_noticias': cantidad_noticias,
+        'cantidad_actividades': cantidad_actividades,
         'criticas_por_usuario': json.dumps(list(criticas_por_usuario)),
         'criticas_por_fecha': json.dumps(criticas_por_fecha),
         'tipos': json.dumps(list(tipos)),
@@ -228,6 +235,64 @@ def noticias_admin(request):
     }
 
     return render(request, 'mainapp/noticias_admin.html', context)
+
+@admin_required
+def calendario_admin(request):
+    nombre = request.user.nombre
+    actividades = Actividad.objects.all()
+
+    if request.method == 'POST' and 'nueva_actividad' in request.POST:
+        form = ActividadForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Actividad registrada exitosamente.')
+            return redirect('calendario_admin')
+        else:
+            messages.error(request, 'Error al registrar la actividad. Verifica los datos ingresados.')
+    else:
+        form = ActividadForm()
+
+    context = {
+        'actividades': actividades,
+        'form': form,
+        'nombre': nombre,
+    }
+
+    return render(request, 'mainapp/calendario_admin.html', context)
+
+
+@login_required
+def obtener_actividades(request):
+    actividades = Actividad.objects.all()
+    actividades_json = [
+        {
+            'title': actividad.descripcion,
+            'start': actividad.datetime.strftime('%Y-%m-%d'),
+            'url': reverse('editar_actividad', args=[actividad.pk])
+        }
+        for actividad in actividades
+    ]
+    return JsonResponse(actividades_json, safe=False)
+
+@admin_required
+def editar_actividad(request, pk):
+    actividad = get_object_or_404(Actividad, pk=pk)
+    if request.method == 'POST':
+        form = EditarActividadForm(request.POST, instance=actividad)
+        if form.is_valid():
+            actividad = form.save(commit=False)
+
+            actividad.save()
+            messages.success(request, 'Actividad editada exitosamente.')
+            return redirect('calendario_admin')
+        else:
+            messages.error(request, 'Error al editar la actividad. Verifica los datos ingresados.')
+    else:
+        form = EditarActividadForm(instance=actividad)
+
+    return render(request, 'mainapp/editar_actividad.html', {'form': form})
+
+
 
 ''' --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- '''
 
@@ -471,7 +536,7 @@ def login_view(request):
                 if tipo_permiso == 1:
                     next_url = request.GET.get('next', 'admin_view')
                 else:
-                    next_url = request.GET.get('next', 'mis_criticas')
+                    next_url = request.GET.get('next', 'calendario')
 
                 return redirect(next_url)
             else:
@@ -518,13 +583,13 @@ def logout_view(request):
     # Limpia la sesión del usuario
     # logout(request)
     django_logout(request)
-    return redirect('home')
+    return redirect('login')
 
 
 # Vista/ funcion para salir del sistema automaticamente
 def logout_and_redirect_home(request):
     logout(request)
-    return redirect('home')  # 'home' es el nombre de la vista inicial
+    return redirect('login')  # 'home' es el nombre de la vista inicial
 
 # Vista de perfil de usuario
 @login_required
@@ -804,7 +869,28 @@ def eliminar_noticia(request, pk):
     
     return render(request, 'mainapp/detalle_noticia_admin.html', {'form': form, 'noticia': noticia})
 
+
+@login_required
 def calendario(request):
-    # Obtener el usuario actual que ha iniciado sesión
-    usuario = request.user.nombre
-    return render(request, 'mainapp/calendario.html', {'usuario': usuario})
+    usuario = request.user.correo
+    nombre = request.user.nombre
+    colaborador = User.objects.get(correo=usuario)
+    actividades = Actividad.objects.filter(user=colaborador)
+
+    context = {
+        'actividades': actividades,
+        'usuario': usuario,
+        'nombre': nombre,
+    }
+
+    return render(request, 'mainapp/calendario.html', context)
+
+@login_required
+def detalle_actividad(request, pk):
+    actividad = get_object_or_404(Actividad, pk=pk)
+
+    context = {
+        'actividad': actividad
+    }
+
+    return render(request, 'mainapp/detalle_actividad.html', context)

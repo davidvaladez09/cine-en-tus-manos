@@ -40,9 +40,16 @@ urlpatterns = [
     path('recuperar_password/', views.recuperar_password, name='recuperar_password'),
     path('logout/', views.logout_view, name='logout_view'),
     path('logout_and_redirect_home/', views.logout_and_redirect_home, name='logout_and_redirect_home'),
+
+    path('calendario_admin/', views.calendario_admin, name='calendario_admin'),
+    path('editar_actividad/<int:pk>/', views.editar_actividad, name='editar_actividad'),
+    path('obtener_actividades/', views.obtener_actividades, name='obtener_actividades'),
+    path('detalle_actividad/<int:pk>/', views.detalle_actividad, name='detalle_actividad'),
+
     path('calendario/', views.calendario, name='calendario'),
 
     # URL ADMINISTRADOR
     path('admin_view/', views.admin_view, name='admin_view'),
     path('no_permission/', views.no_permission, name='no_permission'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

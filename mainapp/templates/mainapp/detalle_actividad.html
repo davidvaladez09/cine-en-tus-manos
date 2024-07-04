@@ -1,0 +1,6 @@
+<div class="container">
+    <h2>Detalles de la Actividad</h2>
+    <p><strong>Descripción:</strong> {{ actividad.descripcion }}</p>
+    <p><strong>Fecha:</strong> {{ actividad.datetime }}</p>
+    <p><strong>Estado:</strong> {% if actividad.estado %}Realizada{% else %}Pendiente{% endif %}</p>
+</div>
