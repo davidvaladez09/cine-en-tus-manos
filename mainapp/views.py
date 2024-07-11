@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
@@ -14,9 +14,10 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.serializers import serialize
 from django.views.decorators.http import require_GET
 from .models import User, FotosPerfil, Critica, Tipo, Noticia, Actividad
-from .forms import UserRegistrationForm, CriticaForm, PerfilForm, EditarCriticaForm, PerfilFormEditar, CriticaFilterForm, CriticaFilterFormWhitFilter, NoticiaForm, NoticiaFilterFormWhitFilter, EditarNoticiaForm, ActividadForm, EditarActividadForm
+from .forms import UserRegistrationForm, CriticaForm, PerfilForm, EditarCriticaForm, PerfilFormEditar, CriticaFilterForm, CriticaFilterFormWhitFilter, NoticiaForm, NoticiaFilterFormWhitFilter, EditarNoticiaForm, ActividadForm, EditarActividadForm, BusquedaFilter
+
 from .tmdb import search_movie, get_movie_details
-from .decorators import admin_required
+from .decorators import admin_required, root_required
 import os
 import json
 import datetime
@@ -56,34 +57,45 @@ def registro_usuario(request):
 
 @admin_required
 def editar_eliminar_usuario(request):
+    current_user = request.user
+
     if request.method == 'POST':
         correo = request.POST.get('correo')
         if correo:
             try:
                 usuario = User.objects.get(correo=correo)
+                form = PerfilFormEditar(request.POST, request.FILES, instance=usuario, fotos_perfil=FotosPerfil.objects.all())
                 if 'update' in request.POST:
-                    form = PerfilFormEditar(request.POST, request.FILES, instance=usuario, fotos_perfil=FotosPerfil.objects.all())
                     if form.is_valid():
-                        form.save()
-                        messages.success(request, f'El usuario {usuario.nombre} ha sido actualizado correctamente.')
+                        if current_user.permisos_id == 1 and usuario.permisos_id == 1:
+                            messages.error(request, 'No tienes permisos para editar este usuario.')
+                        elif current_user.permisos_id == 1 and form.cleaned_data.get('permisos').id == 4:
+                            messages.error(request, 'No tienes permisos para asignar permisos de tipo Root.')
+                        else:
+                            form.save()
+                            messages.success(request, f'El usuario {usuario.nombre} ha sido actualizado correctamente. :)')
                     else:
                         messages.error(request, f'Error al actualizar el usuario {usuario.nombre}.')
                 elif 'delete' in request.POST:
-                    usuario.delete()
-                    messages.success(request, f'El usuario {usuario.nombre} ha sido eliminado correctamente.')
+                    if current_user.permisos_id == 1 and usuario.permisos_id == 1:
+                        messages.error(request, 'No tienes permisos para eliminar este usuario.')
+                    else:
+                        usuario.delete()
+                        messages.success(request, f'El usuario {usuario.nombre} ha sido eliminado correctamente. :)')
             except User.DoesNotExist:
                 messages.error(request, 'No se encontró el usuario especificado.')
         else:
             messages.error(request, 'No se proporcionó un correo válido.')
     
-    usuarios = User.objects.all()
-    forms = {}
-    for usuario in usuarios:
-        try:
-            forms[usuario.correo] = PerfilFormEditar(instance=usuario, fotos_perfil=FotosPerfil.objects.all())
-        except Exception as e:
-            messages.error(request, f'Error al crear el formulario para {usuario.correo}: {e}')
-    return render(request, 'mainapp/editar_eliminar_usuario.html', {'usuarios': usuarios, 'forms': forms})
+    usuarios = User.objects.exclude(correo=current_user.correo)
+    forms = {usuario.correo: PerfilFormEditar(instance=usuario, fotos_perfil=FotosPerfil.objects.all()) for usuario in usuarios}
+
+    context = {
+        'usuarios': usuarios, 
+        'forms': forms
+    }
+
+    return render(request, 'mainapp/editar_eliminar_usuario.html', context)
 
 
 @admin_required
@@ -97,7 +109,13 @@ def actualizar_usuario(request, correo):
             return redirect('editar_eliminar_usuario')
     else:
         form = UserRegistrationForm(instance=usuario)
-    return render(request, 'mainapp/actualizar_usuario.html', {'form': form, 'usuario': usuario})
+
+    context = {
+        'form': form, 
+        'usuario': usuario
+    }
+
+    return render(request, 'mainapp/actualizar_usuario.html', context)
 
 @admin_required
 def eliminar_usuario(request, correo):
@@ -106,7 +124,12 @@ def eliminar_usuario(request, correo):
         usuario.delete()
         messages.success(request, f'El usuario {usuario.correo} ha sido eliminado.')
         return redirect('editar_eliminar_usuario')
-    return render(request, 'mainapp/eliminar_usuario.html', {'usuario': usuario})
+    
+    context = {
+        'usuario': usuario,
+    }
+
+    return render(request, 'mainapp/eliminar_usuario.html', context)
 
 @admin_required
 def detalle_usuario(request):
@@ -290,7 +313,11 @@ def editar_actividad(request, pk):
     else:
         form = EditarActividadForm(instance=actividad)
 
-    return render(request, 'mainapp/editar_actividad.html', {'form': form})
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'mainapp/editar_actividad.html', context)
 
 
 
@@ -305,9 +332,15 @@ def nostros(request):
 # Vista de la ventana inicial de la app
 def home(request):
     criticas = Critica.objects.all().order_by('-datetime')
+    # Obtener noticias
+    noticias = Noticia.objects.all().order_by('-datetime')
+
+    # Verificar si el usuario ha aceptado las cookies
+    show_cookie_banner = not request.COOKIES.get('accepted_cookies', False)
 
     if request.method == 'GET':
         filter_form = CriticaFilterForm(request.GET)
+        busqueda_form = BusquedaFilter(request.GET)
 
         if filter_form.is_valid():
             calificacion_min = filter_form.cleaned_data.get('calificacion')
@@ -329,16 +362,52 @@ def home(request):
             elif fecha_orden == 'desc':
                 criticas = criticas.order_by('-datetime')
 
+
+    elif request.method == 'POST' and 'accept_cookies' in request.POST:
+        response = redirect('home')
+        response.set_cookie('accepted_cookies', True, max_age=365*24*60*60)  # La cookie dura 1 año
+        return response
+
     else:
         filter_form = CriticaFilterForm()
 
     context = {
         'criticas': criticas,
         'filter_form': filter_form,
+        'show_cookie_banner': show_cookie_banner,
+        'noticias': noticias,
     }
 
     return render(request, 'mainapp/main.html', context)
 
+def buscar(request):
+    query = request.GET.get('q')
+    resultados_criticas = []
+    resultados_noticias = []
+
+    if query:
+        # Filtrar por nombre
+        criticas_nombre = Critica.objects.filter(Q(nombre__icontains=query))
+        noticias_nombre = Noticia.objects.filter(Q(nombre__icontains=query))
+        
+        # Filtrar por año en Critica y por año en el campo datetime de Noticia
+        if query.isdigit():
+            criticas_año = Critica.objects.filter(ano=query)
+            #noticias_año = Noticia.objects.filter(datetime__year=query)
+        else:
+            criticas_año = Critica.objects.none()
+            #noticias_año = Noticia.objects.none()
+        
+        # Combinar resultados
+        resultados_criticas = criticas_nombre | criticas_año
+        resultados_noticias = noticias_nombre #| noticias_año
+
+    context = {
+        'query': query,
+        'resultados_criticas': resultados_criticas,
+        'resultados_noticias': resultados_noticias
+    }
+    return render(request, 'mainapp/resultados_busqueda.html', context)
 
 def peliculas(request):
     criticas = Critica.objects.filter(tipo='1').order_by('-datetime')
@@ -512,8 +581,13 @@ def login_view(request):
         # Redirigir según el permiso del usuario
         if tipo_permiso == 1:
             return redirect('admin_view')
+        elif tipo_permiso == 3:
+            messages.error(request, 'TU USUARIO HA SIDO INHABILITADO POR EL ADMINISTRADOR.')
+            return redirect('login')
+        elif tipo_permiso == 3:
+            return redirect('admin_view')
         else:
-            return redirect('perfil')
+            return redirect('calendario')
 
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -522,11 +596,15 @@ def login_view(request):
         try:
             user = User.objects.get(correo=email)
             if user.check_password(password):
+                if user.permisos_id == 3:
+                    messages.error(request, 'TU USUARIO HA SIDO INHABILITADO POR EL ADMINISTRADOR.')
+                    return redirect('login')
+                
                 request.session['correo'] = user.correo
                 request.session['nombre'] = user.nombre
                 
                 # Obtener el tipo de permiso del usuario
-                tipo_permiso = user.permisos_id#user.permisos.tipo
+                tipo_permiso = user.permisos_id
                 
                 request.session['tipo_permiso'] = tipo_permiso
 
@@ -535,8 +613,10 @@ def login_view(request):
                 # Redirigir según el permiso del usuario
                 if tipo_permiso == 1:
                     next_url = request.GET.get('next', 'admin_view')
-                else:
+                elif tipo_permiso == 2:
                     next_url = request.GET.get('next', 'calendario')
+                elif tipo_permiso == 4:
+                    next_url = request.GET.get('next', 'admin_view')
 
                 return redirect(next_url)
             else:
@@ -550,7 +630,13 @@ def login_view(request):
 def detalle_critica(request, pk):
     video = Critica.objects.first()  # Suponiendo que solo hay un video en la base de datos, puedes adaptar esto según tus necesidades
     critica = get_object_or_404(Critica, pk=pk)
-    return render(request, 'mainapp/detalle_critica.html', {'critica': critica, 'video': video})
+
+    context = {
+        'critica': critica, 
+        'video': video,
+    }
+
+    return render(request, 'mainapp/detalle_critica.html', context)
 
 
 
@@ -567,7 +653,21 @@ def filtrar_criticas(request):
         criticas = Critica.objects.all()
 
     # Renderizar el template con las críticas filtradas
-    return render(request, 'mainapp/filtrar_criticas.html', {'criticas': criticas})
+
+    context = {
+        'criticas': criticas,
+    }
+
+    return render(request, 'mainapp/filtrar_criticas.html', context)
+
+
+def perfil_colaborador(request, correo):
+    colaborador = get_object_or_404(User, correo=correo)
+    
+    context = {
+        'colaborador': colaborador,
+    }
+    return render(request, 'mainapp/perfil_colaborador.html', context)
 
 
 ''' --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- '''
@@ -619,7 +719,13 @@ def perfil(request):
     # Ocultar el campo permisos en el formulario para usuarios comunes
     form.fields.pop('permisos', None)
 
-    return render(request, 'mainapp/perfil.html', {'usuario': usuario, 'form': form, 'fotos_perfil': fotos_perfil})
+    context = {
+        'usuario': usuario, 
+        'form': form, 
+        'fotos_perfil': fotos_perfil,
+    }
+
+    return render(request, 'mainapp/perfil.html', context)
     
 
 # Vista modifcar perfil de usuario
@@ -638,7 +744,11 @@ def editar_perfil(request):
     else:
         form = PerfilForm(instance=request.user)  # Crea una instancia del formulario con los datos del usuario actual
 
-    return render(request, 'mainapp/editar_perfil.html', {'form': form})
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'mainapp/editar_perfil.html', context)
 
 
 # Vista que permite filtrar las peliculas
@@ -672,11 +782,20 @@ def critica(request):
             messages.error(request, ' ERROR AL PUBLICAR RESEÑA. REVISA LOS DATOS INGRESADOS.')  # Mensaje de error
     else:
         form = CriticaForm()
-    return render(request, 'mainapp/critica.html', {'form': form, 'correo': correo, 'nombre': nombre})
+
+    context = {
+        'form': form, 
+        'correo': correo, 
+        'nombre': nombre,
+    }
+
+    return render(request, 'mainapp/critica.html', context)
 
 @login_required
 def noticia(request):
     usuario = request.user.nombre  # Usar el nombre de usuario en lugar de first_name
+    # Filtrar las críticas del usuario actual
+    noticias = Noticia.objects.filter(user=usuario).order_by('-datetime')
     if request.method == 'POST':
         form = NoticiaForm(request.POST, request.FILES)
         if form.is_valid():
@@ -694,6 +813,7 @@ def noticia(request):
     context = {
         'form': form,
         'usuario': usuario,  # Cambiar a 'usuario' para coincidir con la plantilla
+        'noticias': noticias,
     }
     return render(request, 'mainapp/noticia.html', context)
 
@@ -799,7 +919,14 @@ def detalle_critica_admin(request, pk):
     else:
         form = EditarCriticaForm(instance=critica)
 
-    return render(request, 'mainapp/detalle_critica_admin.html', {'critica': critica, 'usuario': request.user, 'form': form, 'fotos_perfil': fotos_perfil})
+    context = {
+        'critica': critica, 
+        'usuario': request.user, 
+        'form': form, 
+        'fotos_perfil': fotos_perfil,
+    }
+
+    return render(request, 'mainapp/detalle_critica_admin.html', context)
 
 @login_required
 def detalle_noticia_admin(request, pk):
@@ -823,7 +950,14 @@ def detalle_noticia_admin(request, pk):
     else:
         form = EditarNoticiaForm(instance=noticia)
 
-    return render(request, 'mainapp/detalle_noticia_admin.html', {'noticia': noticia, 'usuario': request.user, 'form': form, 'fotos_perfil': fotos_perfil})
+    context = {
+        'noticia': noticia, 
+        'usuario': request.user, 
+        'form': form, 
+        'fotos_perfil': fotos_perfil,
+    }
+
+    return render(request, 'mainapp/detalle_noticia_admin.html', context)
 
 
 # Vista para eliminar critica
@@ -845,7 +979,12 @@ def eliminar_critica(request, pk):
     else:
         form = EditarCriticaForm(instance=critica)
     
-    return render(request, 'mainapp/detalle_critica_admin.html', {'form': form, 'critica': critica})
+    context = {
+        'form': form, 
+        'critica': critica,
+    }
+
+    return render(request, 'mainapp/detalle_critica_admin.html', context)
 
 
 # Vista para eliminar noticia
@@ -866,8 +1005,13 @@ def eliminar_noticia(request, pk):
             return redirect('detalle_noticia_admin', pk=noticia.pk)
     else:
         form = EditarNoticiaForm(instance=noticia)
+
+    context = {
+        'form': form, 
+        'noticia': noticia
+    }
     
-    return render(request, 'mainapp/detalle_noticia_admin.html', {'form': form, 'noticia': noticia})
+    return render(request, 'mainapp/detalle_noticia_admin.html', context)
 
 
 @login_required
@@ -885,12 +1029,50 @@ def calendario(request):
 
     return render(request, 'mainapp/calendario.html', context)
 
+
+@login_required
+def editar_actividad(request, pk):
+    actividad = get_object_or_404(Actividad, pk=pk)
+
+    if request.method == 'POST':
+        form = EditarActividadForm(request.POST, instance=actividad)
+        if form.is_valid():
+            form.save()
+            return redirect('detalle_actividad', pk=actividad.pk)
+    else:
+        form = EditarActividadForm(instance=actividad)
+
+    context = {
+        'actividad': actividad,
+        'form': form,
+    }
+    return render(request, 'mainapp/editar_actividad.html', context)
+
+
 @login_required
 def detalle_actividad(request, pk):
     actividad = get_object_or_404(Actividad, pk=pk)
 
+    if request.method == 'POST':
+        form = ActividadForm(request.POST, instance=actividad)
+        if form.is_valid():
+            form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            messages.success(request, 'La actividad ha sido actualizada correctamente.')
+            return redirect('calendario_admin')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False})
+    else:
+        form = ActividadForm(instance=actividad)
+
     context = {
-        'actividad': actividad
+        'actividad': actividad,
+        'form': form
     }
 
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'mainapp/editar_actividad.html', context)
+    
     return render(request, 'mainapp/detalle_actividad.html', context)

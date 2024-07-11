@@ -27,6 +27,36 @@
             <div class="card">
                 <div class="card-body" style="width: 100%;">
                     {{ critica.critica }}
+
+                    <br>
+                    <br>
+                    <label for="inputPassword4" style="color: black; font-weight: bold;">Critica escrita por: </label>
+                    <div class="card">
+                        <div class="card-body" style="width: 100%;">
+                            <a href="{% url 'perfil_colaborador' critica.user.correo %}" style="color: black;">
+                                {{ critica.user.nombre }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <label for="inputPassword4" style="color: aliceblue; font-weight: bold;">Calificacion por cine en tus manos</label>
+            <div class="card">
+                <div class="card-body" style="width: 100%;">
+                    {% with calificacion=critica.calificacion %}
+                        {% if calificacion is not None %}
+                            {% for i in "x"|ljust:10 %}
+                                {% if forloop.counter0 < calificacion|default:0 %}
+                                    <i class="fa fa-star"></i>
+                                {% elif forloop.counter0 < calificacion|default:0|add:0.5 %}
+                                    <i class="fa fa-star-half-alt"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
                 </div>
             </div>
             <br>
@@ -98,33 +128,6 @@
             <div class="card">
                 <div class="card-body" style="width: 100%;">
                     {{ critica.donde_ver }}
-                </div>
-            </div>
-            <br>
-
-            <label for="inputPassword4" style="color: aliceblue; font-weight: bold;">Calificacion por cine en tus manos</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {% with calificacion=critica.calificacion %}
-                        {% if calificacion is not None %}
-                            {% for i in "x"|ljust:10 %}
-                                {% if forloop.counter0 < calificacion|default:0 %}
-                                    <i class="fa fa-star"></i>
-                                {% elif forloop.counter0 < calificacion|default:0|add:0.5 %}
-                                    <i class="fa fa-star-half-alt"></i>
-                                {% else %}
-                                    <i class="far fa-star"></i>
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-                </div>
-            </div>
-            <br>
-            <label for="inputPassword4" style="color: aliceblue; font-weight: bold;">Reseña escrita por</label>
-            <div class="card">
-                <div class="card-body" style="width: 100%;">
-                    {{ critica.user.nombre }}
                 </div>
             </div>
             <br>

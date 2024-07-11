@@ -13,6 +13,8 @@ urlpatterns = [
     path('series/', views.series, name='series'),
     path('trailers/', views.trailers, name='trailers'),
     path('noticias/', views.noticias, name='noticias'),
+    path('perfil_colaborador/<str:correo>/', views.perfil_colaborador, name='perfil_colaborador'),
+    path('buscar/', views.buscar, name='buscar'),
 
     # URL PRIVADOS
     path('login/', views.login_view, name='login'),
@@ -41,12 +43,12 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout_view'),
     path('logout_and_redirect_home/', views.logout_and_redirect_home, name='logout_and_redirect_home'),
 
-    path('calendario_admin/', views.calendario_admin, name='calendario_admin'),
-    path('editar_actividad/<int:pk>/', views.editar_actividad, name='editar_actividad'),
-    path('obtener_actividades/', views.obtener_actividades, name='obtener_actividades'),
-    path('detalle_actividad/<int:pk>/', views.detalle_actividad, name='detalle_actividad'),
-
     path('calendario/', views.calendario, name='calendario'),
+    path('calendario_admin/', views.calendario_admin, name='calendario_admin'),
+    path('obtener_actividades/', views.obtener_actividades, name='obtener_actividades'),
+    path('editar_actividad/<int:pk>/', views.editar_actividad, name='editar_actividad'),
+    path('detalle_actividad/<int:pk>/', views.detalle_actividad, name='detalle_actividad'),
+    
 
     # URL ADMINISTRADOR
     path('admin_view/', views.admin_view, name='admin_view'),

@@ -1,0 +1,51 @@
+{% extends 'mainapp/base.html' %}
+{% load form_extras %}
+{% load static %} <!-- Cargar el tag static -->
+{% get_media_prefix as media_prefix %}
+
+{% block title %}PERFIL{% endblock %}
+
+{% block content %}
+
+<div class='container'>
+    <div class="row g-2">
+        <div class="col-md">
+            <div class="form-floating">
+                <div class="mb-3">
+                    <div class="card" style="width: 32rem; border-radius: 10px;">
+                        <img class="card-img-top" src="{{ colaborador.foto_perfil.direccion.url }}" alt="Foto de perfil" style="border-radius: 10px;" id="foto-perfil-preview">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-weight: bold;">{{ colaborador.nombre }}</h5>
+                            <p class="card-text">{{ colaborador.correo }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="form-floating">
+                <div class="mb-3">
+                    <label for="inputEmail4" style="color: aliceblue; font-weight: bold;">Correo</label>
+                    <div class="card">
+                        <div class="card-body" style="width: 100%;">
+                            {{ colaborador.correo }}
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ colaborador.nombre }}" style='height: 4rem;'>
+                </div>
+                <div class="mb-3">
+                    <label for="descripcion" class="form-label">Descripción</label>
+                    <input type="text" class="form-control" id="descripcion" name="descripcion" value="{{ colaborador.descripcion }}" style='height: 4rem;'>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <br>
+{% endblock %}
+
+

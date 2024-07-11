@@ -1,6 +1,6 @@
 {% extends 'mainapp/base.html' %}
 
-{% block title %}Asignacion de Actividades{% endblock %}
+{% block title %}Asignación de Actividades{% endblock %}
 
 {% block content %}
 
@@ -9,7 +9,7 @@
 <div class="h1">
     <a class="navbar-brand" href={% url 'calendario_admin' %} style="color: #AAB7B8;">
         <img src="{% static 'mainapp/images/icon_calendario.png' %}" alt="Logo" width="60" height="60" class="d-inline-block align-text-top">
-        ASIGNACION DE ACTIVIDADES
+        ASIGNACIÓN DE ACTIVIDADES
     </a>
     <br>
     <div class='h2' style='color: white;'>Bienvenido, {{ nombre }}!</div>
@@ -28,8 +28,8 @@
             {% endfor %}
         </div>
     {% endif %}
-    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#nuevaActividadModal">
-        Registrar Nueva Actividad
+    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#nuevaActividadModal">
+        Asignar Nueva Actividad
     </button>
     <div id="calendar" style="margin-top: 20px;"></div>
 </div>
@@ -39,14 +39,14 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="nuevaActividadModalLabel">Registrar Nueva Actividad</h5>
+                <h5 class="modal-title" id="nuevaActividadModalLabel">Asignar Nueva Actividad</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form method="POST" action="">
                     {% csrf_token %}
                     {{ form.as_p }}
-                    <button type="submit" class="btn btn-primary" name="nueva_actividad">Registrar</button>
+                    <button type="submit" class="btn btn-primary" name="nueva_actividad">Asignar Actividad</button>
                 </form>
             </div>
         </div>
@@ -71,12 +71,17 @@
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             events: "{% url 'obtener_actividades' %}",
+            eventContent: function(arg) {
+                var html = '<div style="color: ' + arg.event.backgroundColor + '">' + arg.event.title + '</div>';
+                return { html: html };
+            },
             eventClick: function(info) {
                 info.jsEvent.preventDefault();
                 var url = info.event.url;

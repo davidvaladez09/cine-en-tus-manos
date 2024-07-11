@@ -216,20 +216,31 @@ class EditarNoticiaForm(forms.ModelForm):
         return cleaned_data
 
 class ActividadForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        self.fields['user'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['descripcion'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+        self.fields['datetime'].widget.attrs.update({'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'})
+
     class Meta:
         model = Actividad
-        fields = ['user', 'descripcion', 'datetime']
+        fields = ['id', 'user', 'descripcion', 'datetime', 'estado']
         widgets = {
             'datetime': forms.DateInput(attrs={'type': 'date'}),
         }
 
 class EditarActividadForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     class Meta:
         model = Actividad
         fields = ['user', 'descripcion', 'datetime', 'estado']
         widgets = {
-            'datetime': forms.DateInput(attrs={'type': 'date'}),
+            'datetime': forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'}),
+            'user': forms.Select(attrs={'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'style': 'height: 4rem; font-size: 22px;'}),
+            'estado': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+class BusquedaFilter(forms.Form):
+    nombre = forms.CharField(max_length=255, required=False, label='Nombre')
+   

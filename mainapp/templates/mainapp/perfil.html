@@ -52,6 +52,8 @@
                             <div class="card-body" style="width: 100%;">
                                 {% if usuario.permisos_id == 1 %}
                                     Administrador
+                                {% elif usuario.permisos_id == 4 %}
+                                    Usuario Root
                                 {% else %}
                                     Colaborador
                                 {% endif %}

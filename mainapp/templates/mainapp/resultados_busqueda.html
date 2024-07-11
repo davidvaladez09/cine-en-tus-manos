@@ -1,0 +1,159 @@
+{% extends 'mainapp/base.html' %}
+
+{% block content %}
+    <div class="h1" style="color: white;">Resultados de la búsqueda para "{{ query }}"</div>
+
+    <br>
+
+    <div class="h2" style="color: white;">Críticas</div>
+
+    <br>
+
+    {% if resultados_criticas %}
+        <div class="row">
+            <div class="col-sm-6 mb-3 mb-sm-0">
+                {% for critica in resultados_criticas|slice:"::2" %}
+                    <a href="{% url 'detalle_critica' critica.pk %}" class="text-decoration-none text-reset">
+                        <div class="card mb-3" style="max-width: 640px; color: black;">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="{{ critica.ruta_foto_critica.url }}" class="card-img-top" alt="...">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ critica.nombre }}</h5>
+                                        <p class="card-text">{{ critica.critica }}</p>
+                                    </div>
+                                </div>
+                                <br>
+                                <footer class="blockquote-footer">Escrita por: <cite title="Source Title"> {{ critica.user.nombre }}  </cite></footer>
+                                <br>
+                                <p class="card-text"><small class="text-body-secondary" style:"margin: 1rem;">{{ critica.datetime }}</small></p>
+                                <div class="card-footer text-body-secondary">
+                                    <label>Calificación: {{ critica.calificacion }}</label><br>
+                                    {% if critica.calificacion %}
+                                        {% with calificacion=critica.calificacion %}
+                                            {% for i in "x"|ljust:10 %}
+                                                {% if forloop.counter0 < calificacion %}
+                                                    <i class="fa fa-star"></i>
+                                                {% elif forloop.counter0 < calificacion|add:'0.5' and not calificacion|floatformat:"0" == calificacion %}
+                                                    <i class="fa fa-star-half-alt"></i>
+                                                {% else %}
+                                                    <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endwith %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <br>
+                {% endfor %}
+            </div>
+        
+            <div class="col-sm-6">
+                {% for critica in resultados_criticas|slice:"1::2" %}
+                    <a href="{% url 'detalle_critica' critica.pk %}" class="text-decoration-none text-reset">
+                        <div class="card mb-3" style="max-width: 640px; color: black;">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="{{ critica.ruta_foto_critica.url }}" class="card-img-top" alt="...">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ critica.nombre }}</h5>
+                                        <p class="card-text">{{ critica.critica }}</p>
+                                    </div>
+                                </div>
+                                <br>
+                                <footer class="blockquote-footer">Escrita por: <cite title="Source Title"> {{ critica.user.nombre }}</cite></footer>
+                                <br>
+                                <p class="card-text"><small class="text-body-secondary">{{ critica.datetime }}</small></p>
+                                <div class="card-footer text-body-secondary">
+                                    <label>Calificación: {{ critica.calificacion }}</label><br>
+                                    {% if critica.calificacion %}
+                                        {% with calificacion=critica.calificacion %}
+                                            {% for i in "x"|ljust:10 %}
+                                                {% if forloop.counter0 < calificacion %}
+                                                    <i class="fa fa-star"></i>
+                                                {% elif forloop.counter0 < calificacion|add:'0.5' and not calificacion|floatformat:"0" == calificacion %}
+                                                    <i class="fa fa-star-half-alt"></i>
+                                                {% else %}
+                                                    <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endwith %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <br>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="h5" style="color: white;">No se encontraron criticas con la busqueda.</div>
+    {% endif %}
+
+    <br>
+
+    <div class="h2" style="color: white;">Noticias</div>
+
+    <br>
+
+    {% if resultados_noticias %}
+        <div class="row">
+            <div class="col-sm-6 mb-3 mb-sm-0">
+                {% for noticia in resultados_noticias|slice:"::2" %}
+                        <div class="card mb-3" style="max-width: 640px; color: black;">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="{{ noticia.ruta_foto_critica.url }}" class="card-img-top" alt="...">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ noticia.nombre }}</h5>
+                                        <p class="card-text">{{ noticia.descripcion }}</p>
+                                    </div>
+                                </div>
+                                <br>
+                                <footer class="blockquote-footer">Escrita por: <cite title="Source Title"> {{ noticia.user.nombre }}  </cite></footer>
+                                <br>
+                                <p class="card-text"><small class="text-body-secondary" style:"margin: 1rem;">{{ noticia.datetime }}</small></p>
+                            </div>
+                        </div>
+                    
+                    <br>
+                {% endfor %}
+            </div>
+        
+            <div class="col-sm-6">
+                {% for noticia in resultados_noticias|slice:"1::2" %}
+                        <div class="card mb-3" style="max-width: 640px; color: black;">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="{{ noticia.ruta_foto_critica.url }}" class="card-img-top" alt="...">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ noticia.nombre }}</h5>
+                                        <p class="card-text">{{ noticia.descripcion }}</p>
+                                    </div>
+                                </div>
+                                <br>
+                                <footer class="blockquote-footer">Escrita por: <cite title="Source Title"> {{ noticia.user.nombre }}</cite></footer>
+                                <br>
+                                <p class="card-text"><small class="text-body-secondary">{{ noticia.datetime }}</small></p>
+                                
+                            </div>
+                        </div>
+                    <br>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="h5" style="color: white;">No se encontraron noticias con la busqueda.</div>
+    {% endif %}
+{% endblock %}

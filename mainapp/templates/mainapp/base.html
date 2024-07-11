@@ -112,7 +112,7 @@
               <li class="nav-item">
                 <a class="nav-link active" href={% url 'login' %}>Iniciar Sesion</a>
               </li>
-              {% if user.permisos_id == 1 %}
+              {% if user.permisos_id == 1 or user.permisos_id == 4 %}
                 <li class="nav-item">
                   <a class="nav-link active" href={% url 'calendario_admin' %}>Asignar Actividades</a>
                 </li>
@@ -120,10 +120,10 @@
                   <a class="nav-link active" href={% url 'calendario' %}>Mi Calendario</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link active" aria-current="page" href={% url 'perfil' %}>Perfil</a>
+                  <a class="nav-link active" href={% url 'admin_view' %}>Administrador</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link active" href={% url 'admin_view' %}>Administrador</a>
+                  <a class="nav-link active" aria-current="page" href={% url 'perfil' %}>Perfil</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link active" href={% url 'mis_criticas' %}>Mis Criticas</a>
@@ -138,7 +138,7 @@
                   <a class="nav-link active" href={% url 'noticias_admin' %}>Noticias</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link active" href={% url 'mis_noticias' %} >Mis Noticias</a>
+                  <a class="nav-link active" href={% url 'mis_noticias' %}>Mis Noticias</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link active" href={% url 'noticia' %} >Realizar Noticia</a>
@@ -154,7 +154,7 @@
                 </li>
                 {% elif user.permisos_id == 2 %}
                 <li class="nav-item">
-                  <a class="nav-link active" href={% url 'calendario' %}>Calendario</a>
+                  <a class="nav-link active" href={% url 'calendario' %}>Mi Calendario</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link active" aria-current="page" href={% url 'perfil' %}>Perfil</a>
@@ -186,10 +186,11 @@
 
             <br>
 
-            <form class="d-flex">
-              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-              <button class="btn btn-outline-success" type="submit">Search</button>
+            <form method="GET" action="{% url 'buscar' %}" class="d-flex">
+              <input class="form-control me-2" type="search" placeholder="Buscar por nombre o año" aria-label="Buscar" name="q">
+              <button class="btn btn-outline-success" type="submit">Buscar</button>
             </form>
+
           </div>
         </div>
       </div>
@@ -206,7 +207,7 @@
     </div>
 
     <!-- Footer -->
-    {% if user.permisos_id == 1 or user.permisos_id == 2 %}
+    {% if user.permisos_id == 1 or user.permisos_id == 2 or user.permisos_id == 4 %}
     {% else %}
       <footer class="bg-dark text-white text-center py-3 w-100">
         <p>&copy; 2024 Cine En Tus Manos. Todos los derechos reservados.</p>

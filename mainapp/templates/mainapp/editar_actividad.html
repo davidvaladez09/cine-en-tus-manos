@@ -1,10 +1,8 @@
-
 <div class="container">
     <h2>Editar Actividad</h2>
-    <form method="POST">
+    <form id="editarActividadForm" method="POST" action="{% url 'detalle_actividad' actividad.pk %}">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <button type="submit" class="btn btn-success">Actualizar Actividad</button>
     </form>
 </div>
-

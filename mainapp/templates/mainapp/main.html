@@ -12,6 +12,18 @@
     </a>
 </div>
 
+ <!-- Banner de cookies -->
+ {% if show_cookie_banner %}
+    <br>
+    <div class="alert alert-primary" role="alert" id="cookie-banner">
+        <p>Utilizamos cookies para mejorar tu experiencia en nuestro sitio web. Al continuar navegando, aceptas nuestro uso de cookies.</p>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" name="accept_cookies" class="btn btn-primary">Aceptar</button>
+        </form>
+    </div>
+{% endif %}
+
 <br>
 
 <!-- Formulario de filtro -->
@@ -31,11 +43,11 @@
 
 <br>
 
-<div class="row">
-    <div class="col-sm-6 mb-3 mb-sm-0">
-        {% for critica in criticas|slice:"::2" %}
+<div class="row row-cols-1 row-cols-md-2 g-4">
+    {% for critica in criticas %}
+        <div class="col">
             <a href="{% url 'detalle_critica' critica.pk %}" class="text-decoration-none text-reset">
-                <div class="card mb-3" style="max-width: 640px; color: black;">
+                <div class="card" style="max-width: 640px; color: black;">
                     <div class="row g-0">
                         <div class="col-md-4">
                             <img src=".{{ critica.ruta_foto_critica.url }}" class="card-img-top" alt="...">
@@ -47,8 +59,9 @@
                             </div>
                         </div>
                         <br>
+                        <footer class="blockquote-footer">Escrita por: <cite title="Source Title"> {{ critica.user.nombre }}  </cite></footer>
+                        <br>
                         <p class="card-text"><small class="text-body-secondary" style:"margin: 1rem;">{{ critica.datetime }}</small></p>
-                        <footer class="blockquote-footer">Escrita por: <cite title="Source Title"> {{ critica.user.nombre }}</cite></footer>
                         <div class="card-footer text-body-secondary">
                             <label>Calificación: {{ critica.calificacion }}</label><br>
                             {% if critica.calificacion %}
@@ -68,75 +81,51 @@
                     </div>
                 </div>
             </a>
-        {% endfor %}
-    </div>
-
-    <div class="col-sm-6">
-        {% for critica in criticas|slice:"1::2" %}
-            <a href="{% url 'detalle_critica' critica.pk %}" class="text-decoration-none text-reset">
-                <div class="card mb-3" style="max-width: 640px; color: black;">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <img src=".{{ critica.ruta_foto_critica.url }}" class="card-img-top" alt="...">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ critica.nombre }}</h5>
-                                <p class="card-text">{{ critica.critica }}</p>
-                                <p class="card-text"><small class="text-body-secondary">{{ critica.datetime }}</small></p>
-                                <br>
-                            </div>
-                        </div>
-                        <footer class="blockquote-footer">Escrita por: <cite title="Source Title"> {{ critica.user.nombre }}</cite></footer>
-                        <div class="card-footer text-body-secondary">
-                            <label>Calificación: {{ critica.calificacion }}</label><br>
-                            {% if critica.calificacion %}
-                                {% with calificacion=critica.calificacion %}
-                                    {% for i in "x"|ljust:10 %}
-                                        {% if forloop.counter0 < calificacion %}
-                                            <i class="fa fa-star"></i>
-                                        {% elif forloop.counter0 < calificacion|add:'0.5' and not calificacion|floatformat:"0" == calificacion %}
-                                            <i class="fa fa-star-half-alt"></i>
-                                        {% else %}
-                                            <i class="far fa-star"></i>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endwith %}
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </a>
-        {% endfor %}
-    </div>
+        </div>
+    {% endfor %}
 </div>
+
+<br>
+
+<div class="h1" style="color: white;">NOTICIAS</div>
+
+<br>
 
 <div id="carouselExampleIndicators" class="carousel slide">
     <div class="carousel-indicators">
-      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        {% for noticia in noticias %}
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="Slide {{ forloop.counter }}"></button>
+        {% endfor %}
     </div>
+
     <div class="carousel-inner">
-      <div class="carousel-item active">
-        <img src="{% static 'mainapp/images/portada.jpeg' %}" class="d-block w-100" alt="...">
-      </div>
-      <div class="carousel-item">
-        <img src="{% static 'mainapp/images/perfil.jpg' %}" class="d-block w-100" alt="...">
-      </div>
-      <div class="carousel-item">
-        <img src="{% static 'mainapp/images/perfil_invertido.png' %}" class="d-block w-100" alt="...">
-      </div>
+        <a href="{% url 'noticias' %}" class="text-decoration-none text-reset">
+        {% for noticia in noticias %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="card text-bg-dark">
+                    <img src="{{ noticia.ruta_foto_critica.url }}" class="card-img" alt="..." style="object-fit: none; width: 100%; height: 30rem;">
+                    <div class="card-img-overlay d-flex flex-column justify-content-end" style="background: rgba(0, 0, 0, 0.5); color: white;">
+                        <h5 class="card-title">{{ noticia.nombre }}</h5>
+                        <p class="card-text">{{ noticia.descripcion }}</p>
+                        <p class="card-text"><small>Última actualización {{ noticia.datetime|date:"d M Y H:i" }}</small></p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </a>    
     </div>
+
     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
     </button>
     <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
     </button>
-  </div>
+</div>
+
+
 
   <br>
   <br>
