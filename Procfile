@@ -1,0 +1,1 @@
+web: gunicorn cine_en_tus_manos.wsgi --log-file -

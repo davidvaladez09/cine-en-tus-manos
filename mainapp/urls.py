@@ -1,7 +1,9 @@
 from django.urls import path
-from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from . import views
+
+
 
 urlpatterns = [
     # URL PUBLICOS
@@ -53,5 +55,6 @@ urlpatterns = [
     # URL ADMINISTRADOR
     path('admin_view/', views.admin_view, name='admin_view'),
     path('no_permission/', views.no_permission, name='no_permission'),
+
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
