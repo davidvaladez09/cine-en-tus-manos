@@ -3,10 +3,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from . import views
 
-
-
 urlpatterns = [
-    # URL PUBLICOS
+    # URL públicos
     path('', views.home, name='home'),
     path('nosotros/', views.nostros, name='nosotros'),
     path('detalle_critica/<int:pk>/', views.detalle_critica, name='detalle_critica'),
@@ -18,7 +16,7 @@ urlpatterns = [
     path('perfil_colaborador/<str:correo>/', views.perfil_colaborador, name='perfil_colaborador'),
     path('buscar/', views.buscar, name='buscar'),
 
-    # URL PRIVADOS
+    # URL privados
     path('login/', views.login_view, name='login'),
     path('registro_usuario/', views.registro_usuario, name='registro_usuario'),
     path('editar_eliminar_usuario/', views.editar_eliminar_usuario, name='editar_eliminar_usuario'),
@@ -50,11 +48,8 @@ urlpatterns = [
     path('obtener_actividades/', views.obtener_actividades, name='obtener_actividades'),
     path('editar_actividad/<int:pk>/', views.editar_actividad, name='editar_actividad'),
     path('detalle_actividad/<int:pk>/', views.detalle_actividad, name='detalle_actividad'),
-    
 
-    # URL ADMINISTRADOR
+    # URL administrador
     path('admin_view/', views.admin_view, name='admin_view'),
     path('no_permission/', views.no_permission, name='no_permission'),
-
-
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
