@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+&1mjrg&ay$$hn2b2vypj!g6m*dsxwr*hou9lv3dc#ts4052$8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -89,7 +89,7 @@ DATABASES = {
 }
 '''
 
-'''DATABASES = {
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'cine_en_tus_manos',
@@ -98,8 +98,9 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '3306',
     }
-} '''
+} 
 
+'''
 import dj_database_url
 from decouple import config
 
@@ -107,7 +108,7 @@ DATABASES = {
     'default': dj_database_url.config(
         default=config('DATABASE_URL')
     )
-}
+}'''
 
 
 
