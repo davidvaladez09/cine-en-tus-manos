@@ -196,4 +196,4 @@ MESSAGE_TAGS = {
     messages.ERROR: 'error',
 }
 
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
