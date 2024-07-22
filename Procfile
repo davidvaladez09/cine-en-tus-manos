@@ -1,1 +1,1 @@
-web: gunicorn cine_en_tus_manos.wsgi --log-file -
+echo "web: echo 'Hello, Heroku!'" > Procfile
